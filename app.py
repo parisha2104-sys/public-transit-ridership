@@ -8,6 +8,7 @@ import plotly.graph_objects as go
 from statsmodels.tsa.arima.model import ARIMA
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 import warnings
+
 warnings.filterwarnings("ignore")
 
 # ----------------------------
@@ -24,7 +25,6 @@ st.set_page_config(
 # ----------------------------
 st.title("🚌 Public Transit Ridership Forecasting & Analytics Dashboard")
 st.markdown("### AI Application Project | **Parisha • Rishika • Tanisha**")
-
 st.write("---")
 
 # ----------------------------
@@ -46,7 +46,7 @@ df = load_data()
 def generate_route_coordinates(df):
     route_ids = df["Route_ID"].unique()
 
-    # Chandigarh approx center coordinates
+    # Chandigarh city center coordinates
     base_lat = 30.7333
     base_lon = 76.7794
 
@@ -63,7 +63,6 @@ def generate_route_coordinates(df):
 
 route_coords = generate_route_coordinates(df)
 
-# Add lat/lon columns
 df["Latitude"] = df["Route_ID"].map(lambda x: route_coords[x][0])
 df["Longitude"] = df["Route_ID"].map(lambda x: route_coords[x][1])
 
@@ -77,7 +76,6 @@ weather_filter = st.sidebar.selectbox("Select Weather", ["All"] + sorted(df["Wea
 weekend_filter = st.sidebar.selectbox("Weekend Filter", ["All", "Weekend Only", "Weekday Only"])
 holiday_filter = st.sidebar.selectbox("Holiday Filter", ["All", "Holiday Only", "Non-Holiday Only"])
 
-# Apply filters
 filtered_df = df.copy()
 
 if route_filter != "All":
@@ -97,13 +95,14 @@ elif holiday_filter == "Non-Holiday Only":
     filtered_df = filtered_df[filtered_df["Is_Holiday"] == 0]
 
 # ----------------------------
-# SIDEBAR NAVIGATION
+# SIDEBAR NAVIGATION MENU
 # ----------------------------
+st.sidebar.header("📌 Navigation Menu")
+
 menu = st.sidebar.radio(
-    "📌 Navigation Menu",
+    "Choose Section",
     [
         "Dashboard",
-        "Route Query Assistant"
         "Ridership Forecasting (ARIMA)",
         "Revenue Forecasting (ARIMA)",
         "Preferred Routes",
@@ -112,6 +111,7 @@ menu = st.sidebar.radio(
         "Weekend vs Weekday Analysis",
         "Festive/Holiday Analysis",
         "Interactive Route Map (Chandigarh)",
+        "Route Query Assistant",
         "About"
     ]
 )
@@ -124,8 +124,13 @@ if menu == "Dashboard":
 
     total_passengers = filtered_df["Passengers"].sum()
     total_revenue = filtered_df["Revenue"].sum()
+
     avg_daily_passengers = filtered_df.groupby("Date")["Passengers"].sum().mean()
-    busiest_route = filtered_df.groupby("Route_ID")["Passengers"].sum().idxmax()
+
+    if len(filtered_df) > 0:
+        busiest_route = filtered_df.groupby("Route_ID")["Passengers"].sum().idxmax()
+    else:
+        busiest_route = "No Data"
 
     col1, col2, col3, col4 = st.columns(4)
     col1.metric("Total Passengers", f"{total_passengers:,.0f}")
@@ -136,7 +141,6 @@ if menu == "Dashboard":
     st.write("---")
 
     daily_trend = filtered_df.groupby("Date")["Passengers"].sum().reset_index()
-
     fig = px.line(daily_trend, x="Date", y="Passengers", title="Daily Ridership Trend")
     st.plotly_chart(fig, use_container_width=True)
 
@@ -153,14 +157,13 @@ elif menu == "Ridership Forecasting (ARIMA)":
     daily_data = filtered_df.groupby("Date")["Passengers"].sum().reset_index()
     daily_data = daily_data.sort_values("Date")
 
-    st.write("### Actual Daily Ridership")
-    fig = px.line(daily_data, x="Date", y="Passengers", title="Actual Ridership")
+    fig = px.line(daily_data, x="Date", y="Passengers", title="Actual Daily Ridership")
     st.plotly_chart(fig, use_container_width=True)
 
     forecast_days = st.slider("Select Forecast Days", 7, 90, 30)
 
     if len(daily_data) < 20:
-        st.warning("Not enough data after filtering. Please select broader filters.")
+        st.warning("⚠️ Not enough data for forecasting. Try selecting broader filters.")
     else:
         series = daily_data["Passengers"]
 
@@ -175,22 +178,24 @@ elif menu == "Ridership Forecasting (ARIMA)":
         mae = mean_absolute_error(test, predictions)
         rmse = np.sqrt(mean_squared_error(test, predictions))
 
-        st.success(f"Model Evaluation Metrics → MAE: {mae:.2f} | RMSE: {rmse:.2f}")
+        st.success(f"Model Evaluation → MAE: {mae:.2f} | RMSE: {rmse:.2f}")
 
         future_forecast = model_fit.forecast(steps=forecast_days)
 
-        future_dates = pd.date_range(start=daily_data["Date"].max(), periods=forecast_days+1)[1:]
-
-        forecast_df = pd.DataFrame({"Date": future_dates, "Forecast": future_forecast})
+        future_dates = pd.date_range(start=daily_data["Date"].max(), periods=forecast_days + 1)[1:]
+        forecast_df = pd.DataFrame({"Date": future_dates, "Forecast_Passengers": future_forecast})
 
         fig2 = go.Figure()
         fig2.add_trace(go.Scatter(x=daily_data["Date"], y=daily_data["Passengers"], mode="lines", name="Actual"))
-        fig2.add_trace(go.Scatter(x=forecast_df["Date"], y=forecast_df["Forecast"], mode="lines", name="Forecast"))
-        fig2.update_layout(title="Ridership Forecast (ARIMA)", xaxis_title="Date", yaxis_title="Passengers")
+        fig2.add_trace(go.Scatter(x=forecast_df["Date"], y=forecast_df["Forecast_Passengers"], mode="lines", name="Forecast"))
+
+        fig2.update_layout(
+            title="Ridership Forecast (ARIMA)",
+            xaxis_title="Date",
+            yaxis_title="Passengers"
+        )
 
         st.plotly_chart(fig2, use_container_width=True)
-
-        st.write("### Forecast Data Table")
         st.dataframe(forecast_df)
 
 # ----------------------------
@@ -208,7 +213,7 @@ elif menu == "Revenue Forecasting (ARIMA)":
     forecast_days = st.slider("Select Forecast Days", 7, 90, 30)
 
     if len(daily_revenue) < 20:
-        st.warning("Not enough data after filtering.")
+        st.warning("⚠️ Not enough data for forecasting. Try selecting broader filters.")
     else:
         series = daily_revenue["Revenue"]
 
@@ -223,18 +228,22 @@ elif menu == "Revenue Forecasting (ARIMA)":
         mae = mean_absolute_error(test, predictions)
         rmse = np.sqrt(mean_squared_error(test, predictions))
 
-        st.success(f"Model Evaluation Metrics → MAE: {mae:.2f} | RMSE: {rmse:.2f}")
+        st.success(f"Model Evaluation → MAE: {mae:.2f} | RMSE: {rmse:.2f}")
 
         future_forecast = model_fit.forecast(steps=forecast_days)
 
-        future_dates = pd.date_range(start=daily_revenue["Date"].max(), periods=forecast_days+1)[1:]
-
+        future_dates = pd.date_range(start=daily_revenue["Date"].max(), periods=forecast_days + 1)[1:]
         forecast_df = pd.DataFrame({"Date": future_dates, "Forecast_Revenue": future_forecast})
 
         fig2 = go.Figure()
         fig2.add_trace(go.Scatter(x=daily_revenue["Date"], y=daily_revenue["Revenue"], mode="lines", name="Actual"))
         fig2.add_trace(go.Scatter(x=forecast_df["Date"], y=forecast_df["Forecast_Revenue"], mode="lines", name="Forecast"))
-        fig2.update_layout(title="Revenue Forecast (ARIMA)", xaxis_title="Date", yaxis_title="Revenue")
+
+        fig2.update_layout(
+            title="Revenue Forecast (ARIMA)",
+            xaxis_title="Date",
+            yaxis_title="Revenue"
+        )
 
         st.plotly_chart(fig2, use_container_width=True)
         st.dataframe(forecast_df)
@@ -248,17 +257,14 @@ elif menu == "Preferred Routes":
     route_stats = filtered_df.groupby("Route_ID")[["Passengers", "Revenue"]].sum().reset_index()
     route_stats = route_stats.sort_values("Passengers", ascending=False)
 
-    st.write("### Top 10 Routes by Passenger Count")
-    fig = px.bar(route_stats.head(10), x="Route_ID", y="Passengers", title="Top Routes by Ridership")
+    fig = px.bar(route_stats.head(10), x="Route_ID", y="Passengers", title="Top 10 Routes by Passenger Count")
     st.plotly_chart(fig, use_container_width=True)
 
-    st.write("### Top 10 Routes by Revenue")
-    fig2 = px.bar(route_stats.head(10), x="Route_ID", y="Revenue", title="Top Routes by Revenue")
+    fig2 = px.bar(route_stats.head(10), x="Route_ID", y="Revenue", title="Top 10 Routes by Revenue")
     st.plotly_chart(fig2, use_container_width=True)
 
-    st.write("### Recommended Routes to Increase Bus Frequency")
-    recommended = route_stats.head(5)
-    st.dataframe(recommended)
+    st.write("### ✅ Recommended Routes to Increase Bus Frequency")
+    st.dataframe(route_stats.head(5))
 
 # ----------------------------
 # PEAK HOUR ANALYSIS
@@ -268,7 +274,7 @@ elif menu == "Peak Hour Analysis":
 
     peak_stats = filtered_df.groupby("Peak_Hour")["Passengers"].sum().reset_index()
 
-    fig = px.bar(peak_stats, x="Peak_Hour", y="Passengers", title="Passengers During Peak Hours")
+    fig = px.bar(peak_stats, x="Peak_Hour", y="Passengers", title="Passengers Distribution During Peak Hours")
     st.plotly_chart(fig, use_container_width=True)
 
 # ----------------------------
@@ -279,10 +285,10 @@ elif menu == "Weather Impact Analysis":
 
     weather_stats = filtered_df.groupby("Weather")[["Passengers", "Revenue"]].mean().reset_index()
 
-    fig = px.bar(weather_stats, x="Weather", y="Passengers", title="Average Passengers by Weather")
+    fig = px.bar(weather_stats, x="Weather", y="Passengers", title="Average Passengers by Weather Condition")
     st.plotly_chart(fig, use_container_width=True)
 
-    fig2 = px.bar(weather_stats, x="Weather", y="Revenue", title="Average Revenue by Weather")
+    fig2 = px.bar(weather_stats, x="Weather", y="Revenue", title="Average Revenue by Weather Condition")
     st.plotly_chart(fig2, use_container_width=True)
 
     fig3 = px.scatter(filtered_df, x="Temperature", y="Passengers", title="Temperature vs Passengers")
@@ -297,10 +303,10 @@ elif menu == "Weekend vs Weekday Analysis":
     weekend_stats = filtered_df.groupby("Is_Weekend")[["Passengers", "Revenue"]].mean().reset_index()
     weekend_stats["Is_Weekend"] = weekend_stats["Is_Weekend"].map({0: "Weekday", 1: "Weekend"})
 
-    fig = px.bar(weekend_stats, x="Is_Weekend", y="Passengers", title="Average Passengers: Weekday vs Weekend")
+    fig = px.bar(weekend_stats, x="Is_Weekend", y="Passengers", title="Avg Passengers: Weekday vs Weekend")
     st.plotly_chart(fig, use_container_width=True)
 
-    fig2 = px.bar(weekend_stats, x="Is_Weekend", y="Revenue", title="Average Revenue: Weekday vs Weekend")
+    fig2 = px.bar(weekend_stats, x="Is_Weekend", y="Revenue", title="Avg Revenue: Weekday vs Weekend")
     st.plotly_chart(fig2, use_container_width=True)
 
 # ----------------------------
@@ -312,23 +318,22 @@ elif menu == "Festive/Holiday Analysis":
     holiday_stats = filtered_df.groupby("Is_Holiday")[["Passengers", "Revenue"]].mean().reset_index()
     holiday_stats["Is_Holiday"] = holiday_stats["Is_Holiday"].map({0: "Normal Day", 1: "Holiday/Festive Day"})
 
-    fig = px.bar(holiday_stats, x="Is_Holiday", y="Passengers", title="Avg Passengers: Holiday vs Normal")
+    fig = px.bar(holiday_stats, x="Is_Holiday", y="Passengers", title="Avg Passengers: Holiday vs Normal Day")
     st.plotly_chart(fig, use_container_width=True)
 
-    fig2 = px.bar(holiday_stats, x="Is_Holiday", y="Revenue", title="Avg Revenue: Holiday vs Normal")
+    fig2 = px.bar(holiday_stats, x="Is_Holiday", y="Revenue", title="Avg Revenue: Holiday vs Normal Day")
     st.plotly_chart(fig2, use_container_width=True)
 
 # ----------------------------
-# INTERACTIVE ROUTE MAP (CHANDIGARH)
+# INTERACTIVE ROUTE MAP
 # ----------------------------
 elif menu == "Interactive Route Map (Chandigarh)":
     st.subheader("🗺️ Interactive Route Map (Chandigarh City)")
 
-    # Chandigarh map center
     chandigarh_map = folium.Map(location=[30.7333, 76.7794], zoom_start=12)
 
     top_routes = filtered_df.groupby("Route_ID")["Passengers"].sum().reset_index()
-    top_routes = top_routes.sort_values("Passengers", ascending=False).head(10)
+    top_routes = top_routes.sort_values("Passengers", ascending=False).head(15)
 
     for _, row in top_routes.iterrows():
         route = row["Route_ID"]
@@ -338,39 +343,17 @@ elif menu == "Interactive Route Map (Chandigarh)":
 
         folium.Marker(
             location=[lat, lon],
-            popup=f"Route: {route}<br>Passengers: {passengers}",
+            popup=f"<b>Route:</b> {route}<br><b>Passengers:</b> {passengers}",
             tooltip=f"{route}"
         ).add_to(chandigarh_map)
 
     st_folium(chandigarh_map, width=1200, height=600)
 
 # ----------------------------
-# ABOUT PAGE
+# ROUTE QUERY ASSISTANT
 # ----------------------------
-elif menu == "About":
-    st.subheader("📌 About This Project")
-
-    st.markdown("""
-    ### 🚍 Public Transit Ridership Forecasting System  
-    This project is designed to analyze and forecast public transit ridership patterns using AI & Machine Learning techniques.
-
-    #### 🔥 Key Features:
-    - Ridership Forecasting using ARIMA Model  
-    - Revenue Trend Prediction  
-    - Peak Hour Demand Analysis  
-    - Weather Impact Analysis  
-    - Weekend vs Weekday Analysis  
-    - Festive/Holiday Ridership Analysis  
-    - Route Recommendation System  
-    - Interactive Route Map (Chandigarh)
-
-    #### 👩‍💻 Developed By:
-    **Parisha • Rishika • Tanisha**
-    """)
-
-    st.success("This dashboard is built using Streamlit, ARIMA Time-Series Forecasting, Plotly, and Folium Maps.")
 elif menu == "Route Query Assistant":
-    st.subheader("🤖 Route Query Assistant (AI Recommendation)")
+    st.subheader("🤖 Route Query Assistant (AI Recommendation System)")
 
     st.write("Ask questions like:")
     st.info("""
@@ -385,17 +368,15 @@ elif menu == "Route Query Assistant":
 
     if st.button("Get Recommendation"):
         if user_query.strip() == "":
-            st.warning("Please enter a question.")
+            st.warning("⚠️ Please type a question first.")
         else:
             query = user_query.lower()
-
             temp_df = df.copy()
 
-            # Weekend-based filter
+            # Weekend filter
             if "weekend" in query:
                 temp_df = temp_df[temp_df["Is_Weekend"] == 1]
 
-            # Weekday filter
             if "weekday" in query:
                 temp_df = temp_df[temp_df["Is_Weekend"] == 0]
 
@@ -413,30 +394,67 @@ elif menu == "Route Query Assistant":
             if "cloud" in query:
                 temp_df = temp_df[temp_df["Weather"].str.lower() == "cloudy"]
 
-            # Decide metric based on query
-            if "revenue" in query or "profit" in query:
-                route_summary = temp_df.groupby("Route_ID")["Revenue"].sum().reset_index()
-                best_route = route_summary.sort_values("Revenue", ascending=False).iloc[0]
-
-                st.success(f"✅ Recommended Route: {best_route['Route_ID']}")
-                st.write(f"💰 Total Revenue: ₹ {best_route['Revenue']:,.0f}")
-
-                fig = px.bar(route_summary.sort_values("Revenue", ascending=False).head(10),
-                             x="Route_ID", y="Revenue",
-                             title="Top Routes by Revenue")
-                st.plotly_chart(fig, use_container_width=True)
-
+            if temp_df.empty:
+                st.error("❌ No data found for this query. Try another question.")
             else:
-                route_summary = temp_df.groupby("Route_ID")["Passengers"].sum().reset_index()
-                best_route = route_summary.sort_values("Passengers", ascending=False).iloc[0]
+                # Revenue based query
+                if "revenue" in query or "profit" in query:
+                    route_summary = temp_df.groupby("Route_ID")["Revenue"].sum().reset_index()
+                    best_route = route_summary.sort_values("Revenue", ascending=False).iloc[0]
 
-                st.success(f"✅ Most Preferable Route: {best_route['Route_ID']}")
-                st.write(f"🧍 Total Passengers: {best_route['Passengers']:,.0f}")
+                    st.success(f"✅ Recommended Route: {best_route['Route_ID']}")
+                    st.write(f"💰 Total Revenue: ₹ {best_route['Revenue']:,.0f}")
 
-                fig = px.bar(route_summary.sort_values("Passengers", ascending=False).head(10),
-                             x="Route_ID", y="Passengers",
-                             title="Top Routes by Ridership")
-                st.plotly_chart(fig, use_container_width=True)
+                    fig = px.bar(
+                        route_summary.sort_values("Revenue", ascending=False).head(10),
+                        x="Route_ID",
+                        y="Revenue",
+                        title="Top 10 Routes by Revenue"
+                    )
+                    st.plotly_chart(fig, use_container_width=True)
 
-            st.write("### Explanation")
-            st.info("The system analyzed historical transit demand based on your query conditions and selected the best performing route.")
+                # Passenger based query
+                else:
+                    route_summary = temp_df.groupby("Route_ID")["Passengers"].sum().reset_index()
+                    best_route = route_summary.sort_values("Passengers", ascending=False).iloc[0]
+
+                    st.success(f"✅ Most Preferable Route: {best_route['Route_ID']}")
+                    st.write(f"🧍 Total Passengers: {best_route['Passengers']:,.0f}")
+
+                    fig = px.bar(
+                        route_summary.sort_values("Passengers", ascending=False).head(10),
+                        x="Route_ID",
+                        y="Passengers",
+                        title="Top 10 Routes by Ridership"
+                    )
+                    st.plotly_chart(fig, use_container_width=True)
+
+                st.write("### Explanation")
+                st.info("The system analyzed transit demand patterns based on your question and recommended the highest performing route.")
+
+# ----------------------------
+# ABOUT PAGE
+# ----------------------------
+elif menu == "About":
+    st.subheader("📌 About This Project")
+
+    st.markdown("""
+    ### 🚍 Public Transit Ridership Forecasting System  
+    This project is designed to analyze and forecast public transit ridership patterns using AI & Machine Learning techniques.
+
+    #### 🔥 Key Features:
+    - Ridership Forecasting using ARIMA  
+    - Revenue Trend Prediction  
+    - Preferred Route Recommendation System  
+    - Peak Hour Demand Analysis  
+    - Weather Impact Analysis  
+    - Weekend vs Weekday Analysis  
+    - Festive/Holiday Ridership Analysis  
+    - Interactive Route Map (Chandigarh)  
+    - Route Query Assistant  
+
+    #### 👩‍💻 Developed By:
+    **Parisha • Rishika • Tanisha**
+    """)
+
+    st.success("Built using Streamlit, ARIMA Time-Series Forecasting, Plotly Graphs, and Folium Maps.")
