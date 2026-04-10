@@ -103,6 +103,7 @@ menu = st.sidebar.radio(
     "📌 Navigation Menu",
     [
         "Dashboard",
+        "Route Query Assistant"
         "Ridership Forecasting (ARIMA)",
         "Revenue Forecasting (ARIMA)",
         "Preferred Routes",
@@ -368,3 +369,74 @@ elif menu == "About":
     """)
 
     st.success("This dashboard is built using Streamlit, ARIMA Time-Series Forecasting, Plotly, and Folium Maps.")
+elif menu == "Route Query Assistant":
+    st.subheader("🤖 Route Query Assistant (AI Recommendation)")
+
+    st.write("Ask questions like:")
+    st.info("""
+    - Which route is most preferable?
+    - Best route for weekends?
+    - Best route during rainy weather?
+    - Highest revenue route?
+    - Most crowded route in holidays?
+    """)
+
+    user_query = st.text_input("Type your question:")
+
+    if st.button("Get Recommendation"):
+        if user_query.strip() == "":
+            st.warning("Please enter a question.")
+        else:
+            query = user_query.lower()
+
+            temp_df = df.copy()
+
+            # Weekend-based filter
+            if "weekend" in query:
+                temp_df = temp_df[temp_df["Is_Weekend"] == 1]
+
+            # Weekday filter
+            if "weekday" in query:
+                temp_df = temp_df[temp_df["Is_Weekend"] == 0]
+
+            # Holiday filter
+            if "holiday" in query or "festive" in query or "festival" in query:
+                temp_df = temp_df[temp_df["Is_Holiday"] == 1]
+
+            # Weather filter
+            if "rain" in query:
+                temp_df = temp_df[temp_df["Weather"].str.lower() == "rainy"]
+
+            if "sun" in query:
+                temp_df = temp_df[temp_df["Weather"].str.lower() == "sunny"]
+
+            if "cloud" in query:
+                temp_df = temp_df[temp_df["Weather"].str.lower() == "cloudy"]
+
+            # Decide metric based on query
+            if "revenue" in query or "profit" in query:
+                route_summary = temp_df.groupby("Route_ID")["Revenue"].sum().reset_index()
+                best_route = route_summary.sort_values("Revenue", ascending=False).iloc[0]
+
+                st.success(f"✅ Recommended Route: {best_route['Route_ID']}")
+                st.write(f"💰 Total Revenue: ₹ {best_route['Revenue']:,.0f}")
+
+                fig = px.bar(route_summary.sort_values("Revenue", ascending=False).head(10),
+                             x="Route_ID", y="Revenue",
+                             title="Top Routes by Revenue")
+                st.plotly_chart(fig, use_container_width=True)
+
+            else:
+                route_summary = temp_df.groupby("Route_ID")["Passengers"].sum().reset_index()
+                best_route = route_summary.sort_values("Passengers", ascending=False).iloc[0]
+
+                st.success(f"✅ Most Preferable Route: {best_route['Route_ID']}")
+                st.write(f"🧍 Total Passengers: {best_route['Passengers']:,.0f}")
+
+                fig = px.bar(route_summary.sort_values("Passengers", ascending=False).head(10),
+                             x="Route_ID", y="Passengers",
+                             title="Top Routes by Ridership")
+                st.plotly_chart(fig, use_container_width=True)
+
+            st.write("### Explanation")
+            st.info("The system analyzed historical transit demand based on your query conditions and selected the best performing route.")
