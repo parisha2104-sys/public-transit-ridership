@@ -87,6 +87,7 @@ def dashboard_page():
 
     st.title("🚆 Public Transit Ridership Dashboard")
 
+    # Load CSV
     df = pd.read_csv("data.csv")
 
     st.subheader("📌 Dataset Preview")
@@ -99,6 +100,7 @@ def dashboard_page():
     st.subheader("📍 Column Names")
     st.write(df.columns)
 
+    # Chart section
     numeric_cols = df.select_dtypes(include=["int64", "float64"]).columns
 
     if len(numeric_cols) > 0:
