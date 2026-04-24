@@ -6,3 +6,8 @@ folium
 streamlit-folium
 statsmodels
 scikit-learn
+matplotlib
+
+streamlit-authenticator
+pyyaml
+bcrypt
