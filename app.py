@@ -1,12 +1,11 @@
 import streamlit as st
-import pandas as pd
 import bcrypt
 
 st.set_page_config(page_title="Public Transit Ridership", layout="wide")
 
-# ---------------- SESSION DATABASE ---------------- #
+# ---------------- SESSION STORAGE ---------------- #
 if "users" not in st.session_state:
-    st.session_state.users = {}   # {"username": hashed_password}
+    st.session_state.users = {}
 
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
@@ -75,7 +74,7 @@ def login_page():
         st.rerun()
 
 
-# ---------------- DASHBOARD ---------------- #
+# ---------------- DASHBOARD PAGE ---------------- #
 def dashboard_page():
     st.sidebar.success(f"Welcome {st.session_state.current_user} 👋")
 
@@ -85,30 +84,13 @@ def dashboard_page():
         st.session_state.page = "Login"
         st.rerun()
 
-    st.title("🚆 Public Transit Ridership Dashboard")
+    # ✅ YAHI PE TERA PURANA CODE PASTE HOGA
+    # Filters + Charts + Query bot + everything same
 
-    # Load CSV
-    df = pd.read_csv("data.csv")
-
-    st.subheader("📌 Dataset Preview")
-    st.dataframe(df)
-
-    st.subheader("📊 Basic Analysis")
-    st.write("Total Rows:", df.shape[0])
-    st.write("Total Columns:", df.shape[1])
-
-    st.subheader("📍 Column Names")
-    st.write(df.columns)
-
-    # Chart section
-    numeric_cols = df.select_dtypes(include=["int64", "float64"]).columns
-
-    if len(numeric_cols) > 0:
-        st.subheader("📈 Graph Visualization")
-        col = st.selectbox("Select column for graph", numeric_cols)
-        st.line_chart(df[col])
-    else:
-        st.info("No numeric columns found for chart.")
+    # Example:
+    # import pandas as pd
+    # df = pd.read_csv("data.csv")
+    # ...rest of your old dashboard...
 
 
 # ---------------- MAIN CONTROL ---------------- #
