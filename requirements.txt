@@ -1,13 +1,6 @@
 streamlit
 pandas
 numpy
-plotly
-folium
-streamlit-folium
-statsmodels
-scikit-learn
-matplotlib
-
-streamlit-authenticator
-pyyaml
+streamlit-authenticator==0.3.2
+PyYAML
 bcrypt
