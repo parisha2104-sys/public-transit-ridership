@@ -1,63 +1,71 @@
 import streamlit as st
 import pandas as pd
-import streamlit_authenticator as stauth
+import bcrypt
 
 st.set_page_config(page_title="Public Transit Ridership", layout="wide")
 
-# ---------------- LOGIN SYSTEM ---------------- #
+# ---------------- USERS DATABASE (STATIC) ---------------- #
+# Passwords hashed using bcrypt
+users = {
+    "parisha": bcrypt.hashpw("12345".encode(), bcrypt.gensalt()),
+    "admin": bcrypt.hashpw("admin123".encode(), bcrypt.gensalt())
+}
 
-names = ["Parisha", "Admin"]
-usernames = ["parisha", "admin"]
+# ---------------- SESSION STATE ---------------- #
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
 
-# Passwords (plain)
-passwords = ["12345", "admin123"]
+if "username" not in st.session_state:
+    st.session_state.username = ""
 
-# Convert to hashed passwords
-hashed_passwords = stauth.Hasher(passwords).generate()
+# ---------------- LOGIN PAGE ---------------- #
+if not st.session_state.logged_in:
+    st.title("🔐 Login Page")
 
-authenticator = stauth.Authenticate(
-    names,
-    usernames,
-    hashed_passwords,
-    "ridership_cookie",
-    "random_key_12345",
-    cookie_expiry_days=1
-)
+    username = st.text_input("Username")
+    password = st.text_input("Password", type="password")
 
-name, authentication_status, username = authenticator.login("Login", "main")
+    if st.button("Login"):
+        if username in users:
+            if bcrypt.checkpw(password.encode(), users[username]):
+                st.session_state.logged_in = True
+                st.session_state.username = username
+                st.success("✅ Login successful!")
+                st.rerun()
+            else:
+                st.error("❌ Wrong password")
+        else:
+            st.error("❌ Username not found")
 
-if authentication_status == False:
-    st.error("❌ Wrong Username or Password")
+    st.stop()
 
-if authentication_status == None:
-    st.warning("⚠️ Please enter your username and password")
+# ---------------- LOGOUT BUTTON ---------------- #
+st.sidebar.success(f"Welcome {st.session_state.username} 👋")
+if st.sidebar.button("Logout"):
+    st.session_state.logged_in = False
+    st.session_state.username = ""
+    st.rerun()
 
-if authentication_status:
+# ---------------- DASHBOARD AFTER LOGIN ---------------- #
+st.title("🚆 Public Transit Ridership Dashboard")
 
-    authenticator.logout("Logout", "sidebar")
-    st.sidebar.success(f"Welcome {name} 👋")
+df = pd.read_csv("data.csv")
 
-    # ---------------- DASHBOARD ---------------- #
+st.subheader("📌 Dataset Preview")
+st.dataframe(df)
 
-    st.title("🚆 Public Transit Ridership Dashboard")
+st.subheader("📊 Basic Analysis")
+st.write("Total Rows:", df.shape[0])
+st.write("Total Columns:", df.shape[1])
 
-    df = pd.read_csv("data.csv")
+st.subheader("📍 Column Names")
+st.write(df.columns)
 
-    st.subheader("📌 Dataset Preview")
-    st.dataframe(df)
+numeric_cols = df.select_dtypes(include=["int64", "float64"]).columns
 
-    st.subheader("📊 Basic Analysis")
-    st.write("Total Rows:", df.shape[0])
-    st.write("Total Columns:", df.shape[1])
-
-    st.subheader("📍 Column Names")
-    st.write(df.columns)
-
-    numeric_cols = df.select_dtypes(include=["int64", "float64"]).columns
-
-    if len(numeric_cols) > 0:
-        st.subheader("📈 Graph Visualization")
-        col = st.selectbox("Select column for graph", numeric_cols)
-        st.line_chart(df[col])
-    else:
-        st.info("No numeric columns found for chart.")
+if len(numeric_cols) > 0:
+    st.subheader("📈 Graph Visualization")
+    col = st.selectbox("Select column for graph", numeric_cols)
+    st.line_chart(df[col])
+else:
+    st.info("No numeric columns found for chart.")
