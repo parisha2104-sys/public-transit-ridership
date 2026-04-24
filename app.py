@@ -2,28 +2,23 @@ import streamlit as st
 import pandas as pd
 import streamlit_authenticator as stauth
 
-# ---------------- PAGE CONFIG ---------------- #
 st.set_page_config(page_title="Public Transit Ridership", layout="wide")
-
 
 # ---------------- LOGIN SYSTEM ---------------- #
 
-# Fixed users (password already hashed)
-users = {
-    "parisha": {
-        "name": "Parisha",
-        "password": "$2b$12$O8WjP7z6Z9QmW7VYgqO7FehYxW8iV9m7vJXgW4Xy7aYkW3aU3d3kC"
-    },
-    "admin": {
-        "name": "Admin",
-        "password": "$2b$12$Z1xJ9Jp0zVY8qZQf8aFZWee1bFqvGm5Rj9P8m7g8vWQf9fY8aKj2a"
-    }
-}
+names = ["Parisha", "Admin"]
+usernames = ["parisha", "admin"]
 
-credentials = {"usernames": users}
+# Passwords (plain)
+passwords = ["12345", "admin123"]
+
+# Convert to hashed passwords
+hashed_passwords = stauth.Hasher(passwords).generate()
 
 authenticator = stauth.Authenticate(
-    credentials,
+    names,
+    usernames,
+    hashed_passwords,
     "ridership_cookie",
     "random_key_12345",
     cookie_expiry_days=1
@@ -32,20 +27,20 @@ authenticator = stauth.Authenticate(
 name, authentication_status, username = authenticator.login("Login", "main")
 
 if authentication_status == False:
-    st.error("❌ Wrong username or password")
+    st.error("❌ Wrong Username or Password")
 
 if authentication_status == None:
-    st.warning("⚠️ Please login to continue")
+    st.warning("⚠️ Please enter your username and password")
 
-# ---------------- DASHBOARD AFTER LOGIN ---------------- #
 if authentication_status:
 
     authenticator.logout("Logout", "sidebar")
     st.sidebar.success(f"Welcome {name} 👋")
 
+    # ---------------- DASHBOARD ---------------- #
+
     st.title("🚆 Public Transit Ridership Dashboard")
 
-    # ---------------- LOAD CSV ---------------- #
     df = pd.read_csv("data.csv")
 
     st.subheader("📌 Dataset Preview")
@@ -58,7 +53,6 @@ if authentication_status:
     st.subheader("📍 Column Names")
     st.write(df.columns)
 
-    # ---------------- CHART SECTION ---------------- #
     numeric_cols = df.select_dtypes(include=["int64", "float64"]).columns
 
     if len(numeric_cols) > 0:
