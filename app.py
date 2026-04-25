@@ -93,7 +93,7 @@ def login_page():
 
 
 # ----------------------------
-# MAIN DASHBOARD (YOUR ORIGINAL WEBSITE)
+# MAIN DASHBOARD
 # ----------------------------
 def dashboard():
 
@@ -101,7 +101,7 @@ def dashboard():
     # TITLE
     # ----------------------------
     st.title("🚌 Public Transit Ridership Forecasting & Analytics Dashboard")
-    st.markdown("**Parisha • Rishika • Tanisha**")
+    st.markdown("### AI Application Project | **Parisha • Rishika • Tanisha**")
     st.write("---")
 
     # Logout Button
@@ -125,20 +125,38 @@ def dashboard():
     df = load_data()
 
     # ----------------------------
+    # ROUTE NAME MAPPING (CHANDIGARH STYLE)
+    # ----------------------------
+    route_name_map = {
+        "Route_1": "ISBT Sector 43 ↔ Sector 17",
+        "Route_2": "Railway Station ↔ Sector 17",
+        "Route_3": "PGI ↔ Sector 17",
+        "Route_4": "Mohali Phase 7 ↔ Sector 17",
+        "Route_5": "Panchkula ↔ Sector 17",
+        "Route_6": "Chandigarh Airport ↔ Sector 17",
+        "Route_7": "ISBT Sector 17 ↔ IT Park",
+        "Route_8": "Sector 22 ↔ Sector 34",
+        "Route_9": "Manimajra ↔ ISBT Sector 43",
+        "Route_10": "Sector 15 ↔ GMCH Sector 32"
+    }
+
+    df["Route_Name"] = df["Route_ID"].map(route_name_map)
+    df["Route_Name"] = df["Route_Name"].fillna(df["Route_ID"])
+
+    # ----------------------------
     # ADD DUMMY COORDINATES (CHANDIGARH BASED)
     # ----------------------------
     @st.cache_data
     def generate_route_coordinates(df):
-        route_ids = df["Route_ID"].unique()
+        route_names = df["Route_Name"].unique()
 
-        # Chandigarh city center coordinates
         base_lat = 30.7333
         base_lon = 76.7794
 
         coords = {}
         np.random.seed(42)
 
-        for route in route_ids:
+        for route in route_names:
             coords[route] = (
                 base_lat + np.random.uniform(-0.05, 0.05),
                 base_lon + np.random.uniform(-0.05, 0.05)
@@ -148,15 +166,15 @@ def dashboard():
 
     route_coords = generate_route_coordinates(df)
 
-    df["Latitude"] = df["Route_ID"].map(lambda x: route_coords[x][0])
-    df["Longitude"] = df["Route_ID"].map(lambda x: route_coords[x][1])
+    df["Latitude"] = df["Route_Name"].map(lambda x: route_coords[x][0])
+    df["Longitude"] = df["Route_Name"].map(lambda x: route_coords[x][1])
 
     # ----------------------------
     # SIDEBAR FILTERS
     # ----------------------------
     st.sidebar.header("🔍 Filters")
 
-    route_filter = st.sidebar.selectbox("Select Route", ["All"] + sorted(df["Route_ID"].unique().tolist()))
+    route_filter = st.sidebar.selectbox("Select Route", ["All"] + sorted(df["Route_Name"].unique().tolist()))
     weather_filter = st.sidebar.selectbox("Select Weather", ["All"] + sorted(df["Weather"].unique().tolist()))
     weekend_filter = st.sidebar.selectbox("Weekend Filter", ["All", "Weekend Only", "Weekday Only"])
     holiday_filter = st.sidebar.selectbox("Holiday Filter", ["All", "Holiday Only", "Non-Holiday Only"])
@@ -164,7 +182,7 @@ def dashboard():
     filtered_df = df.copy()
 
     if route_filter != "All":
-        filtered_df = filtered_df[filtered_df["Route_ID"] == route_filter]
+        filtered_df = filtered_df[filtered_df["Route_Name"] == route_filter]
 
     if weather_filter != "All":
         filtered_df = filtered_df[filtered_df["Weather"] == weather_filter]
@@ -213,7 +231,7 @@ def dashboard():
         avg_daily_passengers = filtered_df.groupby("Date")["Passengers"].sum().mean()
 
         if len(filtered_df) > 0:
-            busiest_route = filtered_df.groupby("Route_ID")["Passengers"].sum().idxmax()
+            busiest_route = filtered_df.groupby("Route_Name")["Passengers"].sum().idxmax()
         else:
             busiest_route = "No Data"
 
@@ -339,13 +357,13 @@ def dashboard():
     elif menu == "Preferred Routes":
         st.subheader("🛣️ Preferred Routes Recommendation")
 
-        route_stats = filtered_df.groupby("Route_ID")[["Passengers", "Revenue"]].sum().reset_index()
+        route_stats = filtered_df.groupby("Route_Name")[["Passengers", "Revenue"]].sum().reset_index()
         route_stats = route_stats.sort_values("Passengers", ascending=False)
 
-        fig = px.bar(route_stats.head(10), x="Route_ID", y="Passengers", title="Top 10 Routes by Passenger Count")
+        fig = px.bar(route_stats.head(10), x="Route_Name", y="Passengers", title="Top 10 Routes by Passenger Count")
         st.plotly_chart(fig, use_container_width=True)
 
-        fig2 = px.bar(route_stats.head(10), x="Route_ID", y="Revenue", title="Top 10 Routes by Revenue")
+        fig2 = px.bar(route_stats.head(10), x="Route_Name", y="Revenue", title="Top 10 Routes by Revenue")
         st.plotly_chart(fig2, use_container_width=True)
 
         st.write("### ✅ Recommended Routes to Increase Bus Frequency")
@@ -358,7 +376,6 @@ def dashboard():
         st.subheader("⏰ Peak Hour Demand Analysis")
 
         peak_stats = filtered_df.groupby("Peak_Hour")["Passengers"].sum().reset_index()
-
         fig = px.bar(peak_stats, x="Peak_Hour", y="Passengers", title="Passengers Distribution During Peak Hours")
         st.plotly_chart(fig, use_container_width=True)
 
@@ -417,11 +434,11 @@ def dashboard():
 
         chandigarh_map = folium.Map(location=[30.7333, 76.7794], zoom_start=12)
 
-        top_routes = filtered_df.groupby("Route_ID")["Passengers"].sum().reset_index()
+        top_routes = filtered_df.groupby("Route_Name")["Passengers"].sum().reset_index()
         top_routes = top_routes.sort_values("Passengers", ascending=False).head(15)
 
         for _, row in top_routes.iterrows():
-            route = row["Route_ID"]
+            route = row["Route_Name"]
             passengers = row["Passengers"]
 
             lat, lon = route_coords[route]
@@ -480,30 +497,30 @@ def dashboard():
                     st.error("❌ No data found for this query. Try another question.")
                 else:
                     if "revenue" in query or "profit" in query:
-                        route_summary = temp_df.groupby("Route_ID")["Revenue"].sum().reset_index()
+                        route_summary = temp_df.groupby("Route_Name")["Revenue"].sum().reset_index()
                         best_route = route_summary.sort_values("Revenue", ascending=False).iloc[0]
 
-                        st.success(f"✅ Recommended Route: {best_route['Route_ID']}")
+                        st.success(f"✅ Recommended Route: {best_route['Route_Name']}")
                         st.write(f"💰 Total Revenue: ₹ {best_route['Revenue']:,.0f}")
 
                         fig = px.bar(
                             route_summary.sort_values("Revenue", ascending=False).head(10),
-                            x="Route_ID",
+                            x="Route_Name",
                             y="Revenue",
                             title="Top 10 Routes by Revenue"
                         )
                         st.plotly_chart(fig, use_container_width=True)
 
                     else:
-                        route_summary = temp_df.groupby("Route_ID")["Passengers"].sum().reset_index()
+                        route_summary = temp_df.groupby("Route_Name")["Passengers"].sum().reset_index()
                         best_route = route_summary.sort_values("Passengers", ascending=False).iloc[0]
 
-                        st.success(f"✅ Most Preferable Route: {best_route['Route_ID']}")
+                        st.success(f"✅ Most Preferable Route: {best_route['Route_Name']}")
                         st.write(f"🧍 Total Passengers: {best_route['Passengers']:,.0f}")
 
                         fig = px.bar(
                             route_summary.sort_values("Passengers", ascending=False).head(10),
-                            x="Route_ID",
+                            x="Route_Name",
                             y="Passengers",
                             title="Top 10 Routes by Ridership"
                         )
