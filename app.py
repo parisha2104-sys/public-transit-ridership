@@ -97,9 +97,6 @@ def login_page():
 # ----------------------------
 def dashboard():
 
-    # ----------------------------
-    # TITLE
-    # ----------------------------
     st.title("🚌 Public Transit Ridership Forecasting & Analytics Dashboard")
     st.markdown("### AI Application Project | **Parisha • Rishika • Tanisha**")
     st.write("---")
@@ -120,6 +117,13 @@ def dashboard():
         df = pd.read_csv("public_transit_dataset_clean.csv")
         df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
         df = df.dropna(subset=["Date"])
+
+        # CLEAN ROUTE_ID (IMPORTANT FIX)
+        df["Route_ID"] = df["Route_ID"].astype(str)
+        df["Route_ID"] = df["Route_ID"].str.strip()
+        df["Route_ID"] = df["Route_ID"].str.replace(" ", "_")
+        df["Route_ID"] = df["Route_ID"].str.lower()
+
         return df
 
     df = load_data()
@@ -128,23 +132,23 @@ def dashboard():
     # ROUTE NAME MAPPING (CHANDIGARH STYLE)
     # ----------------------------
     route_name_map = {
-        "Route_1": "ISBT Sector 43 ↔ Sector 17",
-        "Route_2": "Railway Station ↔ Sector 17",
-        "Route_3": "PGI ↔ Sector 17",
-        "Route_4": "Mohali Phase 7 ↔ Sector 17",
-        "Route_5": "Panchkula ↔ Sector 17",
-        "Route_6": "Chandigarh Airport ↔ Sector 17",
-        "Route_7": "ISBT Sector 17 ↔ IT Park",
-        "Route_8": "Sector 22 ↔ Sector 34",
-        "Route_9": "Manimajra ↔ ISBT Sector 43",
-        "Route_10": "Sector 15 ↔ GMCH Sector 32"
+        "route_1": "ISBT Sector 43 ↔ Sector 17",
+        "route_2": "Railway Station ↔ Sector 17",
+        "route_3": "PGI ↔ Sector 17",
+        "route_4": "Mohali Phase 7 ↔ Sector 17",
+        "route_5": "Panchkula ↔ Sector 17",
+        "route_6": "Chandigarh Airport ↔ Sector 17",
+        "route_7": "ISBT Sector 17 ↔ IT Park",
+        "route_8": "Sector 22 ↔ Sector 34",
+        "route_9": "Manimajra ↔ ISBT Sector 43",
+        "route_10": "Sector 15 ↔ GMCH Sector 32"
     }
 
     df["Route_Name"] = df["Route_ID"].map(route_name_map)
     df["Route_Name"] = df["Route_Name"].fillna(df["Route_ID"])
 
     # ----------------------------
-    # ADD DUMMY COORDINATES (CHANDIGARH BASED)
+    # ADD DUMMY COORDINATES
     # ----------------------------
     @st.cache_data
     def generate_route_coordinates(df):
@@ -198,7 +202,7 @@ def dashboard():
         filtered_df = filtered_df[filtered_df["Is_Holiday"] == 0]
 
     # ----------------------------
-    # SIDEBAR NAVIGATION MENU
+    # NAVIGATION MENU
     # ----------------------------
     st.sidebar.header("📌 Navigation Menu")
 
@@ -220,7 +224,7 @@ def dashboard():
     )
 
     # ----------------------------
-    # DASHBOARD PAGE
+    # DASHBOARD
     # ----------------------------
     if menu == "Dashboard":
         st.subheader("📊 Transit Dashboard Overview")
@@ -252,7 +256,7 @@ def dashboard():
         st.plotly_chart(fig2, use_container_width=True)
 
     # ----------------------------
-    # RIDERSHIP FORECASTING (ARIMA)
+    # RIDERSHIP FORECASTING
     # ----------------------------
     elif menu == "Ridership Forecasting (ARIMA)":
         st.subheader("📈 Ridership Forecasting using ARIMA")
@@ -302,7 +306,7 @@ def dashboard():
             st.dataframe(forecast_df)
 
     # ----------------------------
-    # REVENUE FORECASTING (ARIMA)
+    # REVENUE FORECASTING
     # ----------------------------
     elif menu == "Revenue Forecasting (ARIMA)":
         st.subheader("💰 Revenue Forecasting using ARIMA")
@@ -412,7 +416,7 @@ def dashboard():
         st.plotly_chart(fig2, use_container_width=True)
 
     # ----------------------------
-    # FESTIVE/HOLIDAY ANALYSIS
+    # HOLIDAY ANALYSIS
     # ----------------------------
     elif menu == "Festive/Holiday Analysis":
         st.subheader("🎉 Festive Season / Holiday Impact Analysis")
@@ -427,7 +431,7 @@ def dashboard():
         st.plotly_chart(fig2, use_container_width=True)
 
     # ----------------------------
-    # INTERACTIVE ROUTE MAP
+    # MAP
     # ----------------------------
     elif menu == "Interactive Route Map (Chandigarh)":
         st.subheader("🗺️ Interactive Route Map (Chandigarh City)")
@@ -530,7 +534,7 @@ def dashboard():
                     st.info("The system analyzed transit demand patterns based on your question and recommended the highest performing route.")
 
     # ----------------------------
-    # ABOUT PAGE
+    # ABOUT
     # ----------------------------
     elif menu == "About":
         st.subheader("📌 About This Project")
