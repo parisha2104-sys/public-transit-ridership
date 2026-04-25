@@ -101,7 +101,7 @@ def dashboard():
     # TITLE
     # ----------------------------
     st.title("🚌 Public Transit Ridership Forecasting & Analytics Dashboard")
-    st.markdown("### AI Application Project | **Parisha • Rishika • Tanisha**")
+    st.markdown("**Parisha • Rishika • Tanisha**")
     st.write("---")
 
     # Logout Button
