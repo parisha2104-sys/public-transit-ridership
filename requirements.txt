@@ -1,8 +1,9 @@
 streamlit
 pandas
 numpy
-plotly
+bcrypt
 folium
 streamlit-folium
+plotly
 statsmodels
 scikit-learn
