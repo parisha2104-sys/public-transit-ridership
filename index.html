@@ -1,398 +1,1339 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-   <script src="js/main.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>TransitFlow — Move Smarter</title>
+    <title>TransitFlow — Smarter Public Transit</title>
 
-    <link rel="stylesheet" href="css/main.css">
+    <!-- Your CSS is in the root of the GitHub repository -->
+    <link rel="stylesheet" href="main.css">
+
+    <style>
+        /* ==============================
+           TRANSITFLOW HOMEPAGE
+           ============================== */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: #07090d;
+            color: #f5f7fa;
+            font-family: Inter, Arial, Helvetica, sans-serif;
+            overflow-x: hidden;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        button,
+        input {
+            font: inherit;
+        }
+
+        /* ---------- BACKGROUND ---------- */
+
+        body::before {
+            content: "";
+            position: fixed;
+            width: 700px;
+            height: 700px;
+            background: radial-gradient(
+                circle,
+                rgba(199,255,85,0.08),
+                transparent 65%
+            );
+            top: -250px;
+            right: -200px;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(
+                circle,
+                rgba(88,120,255,0.06),
+                transparent 65%
+            );
+            bottom: -250px;
+            left: -200px;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* ---------- NAVBAR ---------- */
+
+        .navbar {
+            width: 100%;
+            height: 76px;
+            padding: 0 6%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            background: rgba(7,9,13,0.82);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 21px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #c7ff55;
+            box-shadow: 0 0 18px rgba(199,255,85,0.7);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: #8f96a5;
+            font-size: 14px;
+            transition: 0.25s ease;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #ffffff;
+        }
+
+        .nav-cta {
+            padding: 11px 18px;
+            border-radius: 10px;
+            background: #c7ff55;
+            color: #080a0f !important;
+            font-weight: 700;
+        }
+
+        .nav-cta:hover {
+            box-shadow: 0 0 25px rgba(199,255,85,0.25);
+            transform: translateY(-1px);
+        }
+
+        /* ---------- HERO ---------- */
+
+        .hero {
+            width: 88%;
+            max-width: 1400px;
+            min-height: 650px;
+            margin: auto;
+
+            display: grid;
+            grid-template-columns: 0.9fr 1.1fr;
+            gap: 50px;
+            align-items: center;
+
+            padding: 80px 0;
+        }
+
+        .hero-content {
+            animation: fadeUp 0.8s ease forwards;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+
+            padding: 7px 12px;
+            border: 1px solid rgba(199,255,85,0.2);
+            background: rgba(199,255,85,0.06);
+            border-radius: 999px;
+
+            color: #c7ff55;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+
+            margin-bottom: 22px;
+        }
+
+        .eyebrow span {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #c7ff55;
+            box-shadow: 0 0 10px #c7ff55;
+        }
+
+        .hero h1 {
+            font-size: clamp(48px, 6vw, 82px);
+            line-height: 0.98;
+            letter-spacing: -4px;
+            max-width: 700px;
+        }
+
+        .hero h1 .green {
+            color: #c7ff55;
+        }
+
+        .hero-description {
+            color: #9299a8;
+            font-size: 17px;
+            line-height: 1.7;
+            max-width: 540px;
+            margin-top: 25px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 13px;
+            margin-top: 32px;
+            flex-wrap: wrap;
+        }
+
+        .primary-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 14px 21px;
+            border-radius: 11px;
+
+            background: #c7ff55;
+            color: #080a0f;
+
+            font-size: 14px;
+            font-weight: 800;
+
+            transition: 0.25s ease;
+        }
+
+        .primary-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 35px rgba(199,255,85,0.2);
+        }
+
+        .secondary-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 14px 21px;
+            border-radius: 11px;
+
+            background: rgba(255,255,255,0.035);
+            border: 1px solid rgba(255,255,255,0.1);
+
+            color: #e8ebef;
+
+            font-size: 14px;
+            font-weight: 700;
+
+            transition: 0.25s ease;
+        }
+
+        .secondary-btn:hover {
+            background: rgba(255,255,255,0.07);
+            border-color: rgba(255,255,255,0.18);
+        }
+
+        /* ---------- NETWORK MAP ---------- */
+
+        .hero-map {
+            position: relative;
+            height: 480px;
+
+            border-radius: 24px;
+            overflow: hidden;
+
+            background:
+                radial-gradient(
+                    circle at 50% 40%,
+                    rgba(42,48,60,0.8),
+                    transparent 55%
+                ),
+                #0b0e14;
+
+            border: 1px solid rgba(255,255,255,0.09);
+
+            box-shadow:
+                0 30px 100px rgba(0,0,0,0.4),
+                inset 0 0 80px rgba(255,255,255,0.015);
+        }
+
+        /* grid */
+
+        .hero-map::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+
+            background-image:
+                linear-gradient(
+                    rgba(255,255,255,0.035) 1px,
+                    transparent 1px
+                ),
+                linear-gradient(
+                    90deg,
+                    rgba(255,255,255,0.035) 1px,
+                    transparent 1px
+                );
+
+            background-size: 42px 42px;
+            opacity: 0.55;
+        }
+
+        /* roads */
+
+        .road {
+            position: absolute;
+            height: 2px;
+            background: rgba(255,255,255,0.07);
+            transform-origin: left center;
+        }
+
+        .road.r1 {
+            width: 100%;
+            top: 48%;
+            left: 0;
+            transform: rotate(-13deg);
+        }
+
+        .road.r2 {
+            width: 90%;
+            top: 63%;
+            left: 5%;
+            transform: rotate(18deg);
+        }
+
+        .road.r3 {
+            width: 80%;
+            top: 30%;
+            left: 10%;
+            transform: rotate(35deg);
+        }
+
+        .road.r4 {
+            width: 75%;
+            top: 76%;
+            left: 5%;
+            transform: rotate(-31deg);
+        }
+
+        /* glowing transit routes */
+
+        .transit-line {
+            position: absolute;
+            height: 4px;
+            border-radius: 99px;
+            background: #c7ff55;
+            box-shadow:
+                0 0 8px rgba(199,255,85,0.8),
+                0 0 22px rgba(199,255,85,0.25);
+        }
+
+        .line-one {
+            width: 78%;
+            left: 8%;
+            top: 43%;
+            transform: rotate(-14deg);
+        }
+
+        .line-two {
+            width: 63%;
+            left: 24%;
+            top: 67%;
+            transform: rotate(20deg);
+            background: #82a8ff;
+            box-shadow:
+                0 0 8px rgba(130,168,255,0.8),
+                0 0 22px rgba(130,168,255,0.25);
+        }
+
+        .line-three {
+            width: 53%;
+            left: 23%;
+            top: 25%;
+            transform: rotate(35deg);
+            background: #f5f7fa;
+            box-shadow: 0 0 12px rgba(255,255,255,0.4);
+        }
+
+        /* stops */
+
+        .stop {
+            position: absolute;
+            width: 13px;
+            height: 13px;
+
+            border-radius: 50%;
+            background: #c7ff55;
+
+            border: 3px solid #0b0e14;
+
+            box-shadow:
+                0 0 0 2px rgba(199,255,85,0.35),
+                0 0 20px rgba(199,255,85,0.45);
+
+            z-index: 3;
+        }
+
+        .stop.s1 {
+            left: 17%;
+            top: 40%;
+        }
+
+        .stop.s2 {
+            left: 38%;
+            top: 35%;
+        }
+
+        .stop.s3 {
+            left: 61%;
+            top: 31%;
+        }
+
+        .stop.s4 {
+            left: 77%;
+            top: 51%;
+        }
+
+        .stop.s5 {
+            left: 53%;
+            top: 67%;
+        }
+
+        .stop.s6 {
+            left: 29%;
+            top: 58%;
+        }
+
+        /* bus */
+
+        .bus {
+            position: absolute;
+            width: 36px;
+            height: 19px;
+
+            border-radius: 5px;
+            background: #c7ff55;
+
+            box-shadow:
+                0 0 15px rgba(199,255,85,0.7);
+
+            z-index: 5;
+
+            animation: moveBus 7s linear infinite;
+        }
+
+        .bus::before {
+            content: "";
+            position: absolute;
+            width: 7px;
+            height: 7px;
+            border-radius: 2px;
+            background: #11151b;
+            top: 4px;
+            left: 5px;
+            box-shadow: 11px 0 #11151b;
+        }
+
+        .bus::after {
+            content: "";
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #080a0f;
+            left: 5px;
+            bottom: -3px;
+            box-shadow: 20px 0 #080a0f;
+        }
+
+        .bus.b1 {
+            top: 39%;
+            left: 20%;
+        }
+
+        .bus.b2 {
+            top: 64%;
+            left: 62%;
+            animation-delay: -3s;
+        }
+
+        /* map labels */
+
+        .map-label {
+            position: absolute;
+            padding: 7px 9px;
+
+            border-radius: 7px;
+            background: rgba(8,10,15,0.8);
+            border: 1px solid rgba(255,255,255,0.08);
+
+            color: #aeb5c2;
+            font-size: 11px;
+
+            backdrop-filter: blur(10px);
+        }
+
+        .label-one {
+            left: 12%;
+            top: 32%;
+        }
+
+        .label-two {
+            right: 10%;
+            top: 43%;
+        }
+
+        .label-three {
+            left: 43%;
+            bottom: 14%;
+        }
+
+        .network-status {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+
+            padding: 8px 11px;
+
+            border-radius: 8px;
+            background: rgba(5,7,10,0.75);
+            border: 1px solid rgba(255,255,255,0.08);
+
+            font-size: 11px;
+            color: #aab1bd;
+            z-index: 10;
+        }
+
+        .network-status span {
+            color: #c7ff55;
+        }
+
+        /* ---------- PLANNER ---------- */
+
+        .planner-section {
+            width: 88%;
+            max-width: 1200px;
+            margin: 0 auto 100px;
+        }
+
+        .planner {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 12px;
+
+            padding: 12px;
+
+            background: rgba(16,19,26,0.8);
+            border: 1px solid rgba(255,255,255,0.08);
+
+            border-radius: 17px;
+
+            box-shadow: 0 25px 70px rgba(0,0,0,0.25);
+        }
+
+        .input-box {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+
+            padding: 14px 16px;
+
+            background: rgba(255,255,255,0.035);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 11px;
+        }
+
+        .input-icon {
+            color: #c7ff55;
+            font-size: 13px;
+        }
+
+        .input-box input {
+            width: 100%;
+            border: none;
+            outline: none;
+            background: transparent;
+
+            color: #ffffff;
+            font-size: 14px;
+        }
+
+        .input-box input::placeholder {
+            color: #737b89;
+        }
+
+        .planner button {
+            border: none;
+            cursor: pointer;
+            padding: 0 23px;
+
+            border-radius: 11px;
+
+            background: #c7ff55;
+            color: #080a0f;
+
+            font-weight: 800;
+
+            transition: 0.25s;
+        }
+
+        .planner button:hover {
+            box-shadow: 0 0 25px rgba(199,255,85,0.2);
+        }
+
+        #routeResults {
+            margin-top: 15px;
+        }
+
+        .route-result {
+            padding: 15px 17px;
+            margin-top: 8px;
+
+            border-radius: 12px;
+            background: #10131a;
+            border: 1px solid rgba(255,255,255,0.07);
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .route-result strong {
+            color: #ffffff;
+        }
+
+        .route-result span {
+            color: #9299a8;
+            font-size: 13px;
+        }
+
+        /* ---------- PRODUCT FEATURES ---------- */
+
+        .section {
+            width: 88%;
+            max-width: 1400px;
+            margin: 0 auto 110px;
+        }
+
+        .section-heading {
+            max-width: 650px;
+            margin-bottom: 38px;
+        }
+
+        .section-heading .small {
+            color: #c7ff55;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .section-heading h2 {
+            font-size: clamp(32px, 4vw, 52px);
+            letter-spacing: -2px;
+            margin-top: 10px;
+        }
+
+        .section-heading p {
+            margin-top: 14px;
+            color: #8f96a5;
+            line-height: 1.7;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .feature-card {
+            min-height: 260px;
+            padding: 28px;
+
+            border-radius: 18px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(255,255,255,0.045),
+                    rgba(255,255,255,0.015)
+                );
+
+            border: 1px solid rgba(255,255,255,0.08);
+
+            transition: 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(199,255,85,0.22);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+        }
+
+        .feature-number {
+            color: #c7ff55;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .feature-card h3 {
+            margin-top: 45px;
+            font-size: 23px;
+            letter-spacing: -0.5px;
+        }
+
+        .feature-card p {
+            color: #858d9b;
+            line-height: 1.7;
+            font-size: 14px;
+            margin-top: 12px;
+        }
+
+        /* ---------- STATS ---------- */
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            border-top: 1px solid rgba(255,255,255,0.08);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .stat {
+            padding: 34px 25px;
+            border-right: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .stat:last-child {
+            border-right: none;
+        }
+
+        .stat-number {
+            font-size: 34px;
+            font-weight: 800;
+            letter-spacing: -1.5px;
+        }
+
+        .stat-label {
+            color: #777f8e;
+            font-size: 13px;
+            margin-top: 7px;
+        }
+
+        /* ---------- CTA ---------- */
+
+        .final-cta {
+            width: 88%;
+            max-width: 1100px;
+            margin: 0 auto 100px;
+
+            text-align: center;
+
+            padding: 75px 30px;
+
+            border-radius: 25px;
+
+            background:
+                radial-gradient(
+                    circle at center,
+                    rgba(199,255,85,0.09),
+                    transparent 55%
+                ),
+                #0d1117;
+
+            border: 1px solid rgba(199,255,85,0.13);
+        }
+
+        .final-cta h2 {
+            font-size: clamp(34px, 5vw, 58px);
+            letter-spacing: -2.5px;
+        }
+
+        .final-cta p {
+            color: #8f96a5;
+            margin: 15px auto 28px;
+            max-width: 550px;
+            line-height: 1.7;
+        }
+
+        /* ---------- FOOTER ---------- */
+
+        footer {
+            padding: 30px 6%;
+            border-top: 1px solid rgba(255,255,255,0.07);
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            color: #656d7b;
+            font-size: 12px;
+        }
+
+        footer strong {
+            color: #c7ff55;
+        }
+
+        /* ---------- ANIMATIONS ---------- */
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(25px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes moveBus {
+            0% {
+                transform: translateX(0) translateY(0);
+            }
+
+            50% {
+                transform: translateX(230px) translateY(-45px);
+            }
+
+            100% {
+                transform: translateX(430px) translateY(5px);
+            }
+        }
+
+        /* ---------- MOBILE ---------- */
+
+        @media (max-width: 900px) {
+
+            .nav-links {
+                display: none;
+            }
+
+            .hero {
+                grid-template-columns: 1fr;
+                padding-top: 55px;
+            }
+
+            .hero-map {
+                height: 400px;
+            }
+
+            .planner {
+                grid-template-columns: 1fr;
+            }
+
+            .planner button {
+                height: 50px;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .stat:nth-child(2) {
+                border-right: none;
+            }
+
+            .stat:nth-child(-n+2) {
+                border-bottom: 1px solid rgba(255,255,255,0.08);
+            }
+        }
+
+        @media (max-width: 550px) {
+
+            .navbar {
+                padding: 0 5%;
+            }
+
+            .hero,
+            .planner-section,
+            .section,
+            .final-cta {
+                width: 90%;
+            }
+
+            .hero h1 {
+                font-size: 48px;
+                letter-spacing: -2.5px;
+            }
+
+            .hero-map {
+                height: 330px;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .stat {
+                border-right: none;
+                border-bottom: 1px solid rgba(255,255,255,0.08);
+            }
+
+            .stat:last-child {
+                border-bottom: none;
+            }
+
+            footer {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-<!-- ================= NAVBAR ================= -->
+    <!-- ================= NAVBAR ================= -->
 
-<header class="nav">
+    <nav class="navbar">
 
-    <a href="index.html" class="brand">
-        <span class="brand-dot"></span>
-        TransitFlow
-    </a>
+        <a href="index.html" class="brand">
+            <span class="brand-dot"></span>
+            TransitFlow
+        </a>
 
-    <nav>
-        <a href="index.html" class="active">Home</a>
-        <a href="dashboard.html">Intelligence</a>
-        <a href="routes.html">Transit Map</a>
-        <a href="forecasting.html">Forecast</a>
-    </nav>
+        <div class="nav-links">
 
-    <a href="dashboard.html" class="nav-btn">
-        Explore platform ↗
-    </a>
-
-</header>
-
-
-<!-- ================= HERO ================= -->
-
-<main>
-
-<section class="hero">
-
-    <div class="hero-copy">
-
-        <div class="eyebrow">
-            <span></span>
-            CITY TRANSIT INTELLIGENCE
-        </div>
-
-        <h1>
-            Move through the city
-            <em>smarter.</em>
-        </h1>
-
-        <p>
-            Plan journeys, understand transit demand and discover
-            what is happening across the network — all in one place.
-        </p>
-
-        <div class="hero-actions">
-
-            <a href="routes.html" class="primary">
-                Plan a journey →
+            <a href="index.html" class="active">
+                Home
             </a>
-
-            <a href="dashboard.html" class="secondary">
-                Explore intelligence
-            </a>
-
-        </div>
-
-        <div class="trust-row">
-
-            <span>● Demo network</span>
-            <span>● Chandigarh Tricity prototype</span>
-            <span>● Data-driven</span>
-
-        </div>
-
-    </div>
-
-
-    <!-- MAP VISUAL -->
-
-    <div class="hero-map">
-
-        <div class="map-grid"></div>
-
-        <div class="route r1"></div>
-        <div class="route r2"></div>
-        <div class="route r3"></div>
-
-        <div class="stop s1">17</div>
-        <div class="stop s2">22</div>
-        <div class="stop s3">34</div>
-        <div class="stop s4">CU</div>
-
-        <div class="bus bus1">🚌</div>
-        <div class="bus bus2">🚌</div>
-
-        <div class="map-label">
-
-            <small>NETWORK STATUS</small>
-
-            <strong>
-                84 routes active
-            </strong>
-
-            <span>
-                Live-style demo data
-            </span>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- ================= JOURNEY PLANNER ================= -->
-
-<section class="planner section">
-
-    <div class="section-head">
-
-        <div>
-
-            <div class="eyebrow">
-                01 / JOURNEY PLANNER
-            </div>
-
-            <h2>
-                Where are you going?
-            </h2>
-
-        </div>
-
-        <span class="muted">
-            Demo network
-        </span>
-
-    </div>
-
-
-    <div class="planner-card">
-
-        <div class="field">
-
-            <label>FROM</label>
-
-            <input
-                id="from"
-                type="text"
-                value="Sector 17"
-            >
-
-        </div>
-
-
-        <div class="swap">
-            ↔
-        </div>
-
-
-        <div class="field">
-
-            <label>TO</label>
-
-            <input
-                id="to"
-                type="text"
-                value="Chandigarh University"
-            >
-
-        </div>
-
-
-        <button
-            class="primary"
-            onclick="planJourney()"
-        >
-            Find routes →
-        </button>
-
-    </div>
-
-
-    <div
-        id="routeResults"
-        class="route-results hidden"
-    ></div>
-
-</section>
-
-
-<!-- ================= FEATURES ================= -->
-
-<section class="features section">
-
-    <div class="section-head">
-
-        <div>
-
-            <div class="eyebrow">
-                02 / ONE NETWORK
-            </div>
-
-            <h2>
-                Built around the way a city moves.
-            </h2>
-
-        </div>
-
-    </div>
-
-
-    <div class="feature-grid">
-
-
-        <article class="feature-card large">
-
-            <span class="feature-icon">
-                ⌖
-            </span>
-
-            <h3>
-                Transit network
-            </h3>
-
-            <p>
-                Explore routes, stops, service status
-                and network activity on an interactive map.
-            </p>
-
-            <a href="routes.html">
-                Open map →
-            </a>
-
-        </article>
-
-
-        <article class="feature-card">
-
-            <span class="feature-icon">
-                ◒
-            </span>
-
-            <h3>
-                Demand intelligence
-            </h3>
-
-            <p>
-                Understand passenger patterns,
-                peaks, routes and revenue.
-            </p>
 
             <a href="dashboard.html">
-                View intelligence →
+                Intelligence
             </a>
 
-        </article>
-
-
-        <article class="feature-card">
-
-            <span class="feature-icon">
-                ↗
-            </span>
-
-            <h3>
-                Forecasting
-            </h3>
-
-            <p>
-                Use historical patterns to estimate
-                future transit demand.
-            </p>
+            <a href="routes.html">
+                Transit Map
+            </a>
 
             <a href="forecasting.html">
-                See forecast →
+                Forecast
             </a>
 
-        </article>
+            <a href="#planner" class="nav-cta">
+                Plan a journey
+            </a>
 
-    </div>
-
-</section>
-
-
-<!-- ================= STATISTICS ================= -->
-
-<section class="stats section">
-
-    <div class="stat">
-
-        <strong data-count="1240000">
-            0
-        </strong>
-
-        <span>
-            Passenger journeys
-        </span>
-
-    </div>
-
-
-    <div class="stat">
-
-        <strong data-count="84">
-            0
-        </strong>
-
-        <span>
-            Routes in network
-        </span>
-
-    </div>
-
-
-    <div class="stat">
-
-        <strong data-count="312">
-            0
-        </strong>
-
-        <span>
-            Active vehicles
-        </span>
-
-    </div>
-
-
-    <div class="stat">
-
-        <strong data-count="17">
-            0
-        </strong>
-
-        <span>
-            Service alerts
-        </span>
-
-    </div>
-
-</section>
-
-
-<!-- ================= CTA ================= -->
-
-<section class="cta section">
-
-    <div>
-
-        <div class="eyebrow">
-            03 / TRANSIT INTELLIGENCE
         </div>
 
-        <h2>
-            See the network beyond the map.
-        </h2>
-
-        <p>
-            From passenger demand to predicted ridership,
-            TransitFlow turns transit data into decisions.
-        </p>
-
-    </div>
+    </nav>
 
 
-    <a href="dashboard.html" class="primary">
-        Open operations view →
-    </a>
+    <!-- ================= HERO ================= -->
 
-</section>
+    <main>
 
-</main>
+        <section class="hero">
+
+            <div class="hero-content">
+
+                <div class="eyebrow">
+                    <span></span>
+                    Public Transit Intelligence
+                </div>
+
+                <h1>
+                    Move through the city
+                    <span class="green">smarter.</span>
+                </h1>
+
+                <p class="hero-description">
+                    TransitFlow brings routes, demand patterns,
+                    transit intelligence and forecasting into one
+                    connected platform for modern urban mobility.
+                </p>
+
+                <div class="hero-buttons">
+
+                    <a href="#planner" class="primary-btn">
+                        Plan a journey →
+                    </a>
+
+                    <a href="dashboard.html" class="secondary-btn">
+                        Explore intelligence
+                    </a>
+
+                </div>
+
+            </div>
 
 
-<!-- ================= FOOTER ================= -->
+            <!-- MAP -->
 
-<footer>
+            <div class="hero-map">
 
-    <span>
-        TransitFlow
-    </span>
+                <div class="network-status">
+                    <span>●</span>
+                    Network simulation active
+                </div>
 
-    <span>
-        Chandigarh Tricity prototype · Demo data
-    </span>
+                <div class="road r1"></div>
+                <div class="road r2"></div>
+                <div class="road r3"></div>
+                <div class="road r4"></div>
 
-</footer>
+                <div class="transit-line line-one"></div>
+                <div class="transit-line line-two"></div>
+                <div class="transit-line line-three"></div>
+
+                <div class="stop s1"></div>
+                <div class="stop s2"></div>
+                <div class="stop s3"></div>
+                <div class="stop s4"></div>
+                <div class="stop s5"></div>
+                <div class="stop s6"></div>
+
+                <div class="bus b1"></div>
+                <div class="bus b2"></div>
+
+                <div class="map-label label-one">
+                    Sector 17
+                </div>
+
+                <div class="map-label label-two">
+                    Sector 34
+                </div>
+
+                <div class="map-label label-three">
+                    Chandigarh University
+                </div>
+
+            </div>
+
+        </section>
 
 
-<script src="js/main.js"></script>
+        <!-- ================= JOURNEY PLANNER ================= -->
+
+        <section class="planner-section" id="planner">
+
+            <div class="planner">
+
+                <div class="input-box">
+
+                    <span class="input-icon">●</span>
+
+                    <input
+                        type="text"
+                        id="from"
+                        value="Sector 17"
+                        placeholder="From"
+                    >
+
+                </div>
+
+                <div class="input-box">
+
+                    <span class="input-icon">◆</span>
+
+                    <input
+                        type="text"
+                        id="to"
+                        value="Chandigarh University"
+                        placeholder="To"
+                    >
+
+                </div>
+
+                <button onclick="planJourney()">
+                    Find routes
+                </button>
+
+            </div>
+
+            <div id="routeResults"></div>
+
+        </section>
+
+
+        <!-- ================= PLATFORM ================= -->
+
+        <section class="section">
+
+            <div class="section-heading">
+
+                <div class="small">
+                    One connected platform
+                </div>
+
+                <h2>
+                    From getting there
+                    to understanding why.
+                </h2>
+
+                <p>
+                    TransitFlow combines the passenger experience
+                    with the intelligence needed to understand
+                    how a public transport network behaves.
+                </p>
+
+            </div>
+
+
+            <div class="feature-grid">
+
+                <article class="feature-card">
+
+                    <div class="feature-number">
+                        01 / NETWORK
+                    </div>
+
+                    <h3>
+                        Explore the network
+                    </h3>
+
+                    <p>
+                        Discover routes, stops, estimated arrivals
+                        and service information through an
+                        interactive transit experience.
+                    </p>
+
+                </article>
+
+
+                <article class="feature-card">
+
+                    <div class="feature-number">
+                        02 / INTELLIGENCE
+                    </div>
+
+                    <h3>
+                        Understand demand
+                    </h3>
+
+                    <p>
+                        Analyse passenger patterns, peak periods,
+                        route performance and network utilization
+                        in one place.
+                    </p>
+
+                </article>
+
+
+                <article class="feature-card">
+
+                    <div class="feature-number">
+                        03 / FORECASTING
+                    </div>
+
+                    <h3>
+                        Predict what comes next
+                    </h3>
+
+                    <p>
+                        Use historical ridership patterns and
+                        forecasting models to anticipate future
+                        transit demand.
+                    </p>
+
+                </article>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= STATS ================= -->
+
+        <section class="section">
+
+            <div class="stats">
+
+                <div class="stat">
+
+                    <div class="stat-number">
+                        1.24M
+                    </div>
+
+                    <div class="stat-label">
+                        Passenger journeys analysed
+                    </div>
+
+                </div>
+
+
+                <div class="stat">
+
+                    <div class="stat-number">
+                        84
+                    </div>
+
+                    <div class="stat-label">
+                        Routes represented
+                    </div>
+
+                </div>
+
+
+                <div class="stat">
+
+                    <div class="stat-number">
+                        312
+                    </div>
+
+                    <div class="stat-label">
+                        Vehicles represented
+                    </div>
+
+                </div>
+
+
+                <div class="stat">
+
+                    <div class="stat-number">
+                        17
+                    </div>
+
+                    <div class="stat-label">
+                        Network alerts
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= FINAL CTA ================= -->
+
+        <section class="final-cta">
+
+            <h2>
+                See the network differently.
+            </h2>
+
+            <p>
+                Explore transit performance, discover demand
+                patterns and understand what the next movement
+                of the network could look like.
+            </p>
+
+            <a href="dashboard.html" class="primary-btn">
+                Open Transit Intelligence →
+            </a>
+
+        </section>
+
+    </main>
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer>
+
+        <div>
+            <strong>TransitFlow</strong>
+            · Public Transit Intelligence
+        </div>
+
+        <div>
+            Demo / simulated transit data
+        </div>
+
+    </footer>
+
+
+    <!-- Root-level JavaScript -->
+    <script src="main.js"></script>
+
+
+    <!-- Fallback journey planner -->
+    <script>
+
+        function planJourney() {
+
+            const from =
+                document.getElementById("from").value || "Your location";
+
+            const to =
+                document.getElementById("to").value || "Destination";
+
+            const results =
+                document.getElementById("routeResults");
+
+            results.innerHTML = `
+
+                <div class="route-result">
+
+                    <div>
+                        <strong>Route 204</strong>
+                        <br>
+                        <span>
+                            ${from} → ${to}
+                        </span>
+                    </div>
+
+                    <div>
+                        <strong>32 min</strong>
+                        <br>
+                        <span>
+                            Fastest · 4 stops
+                        </span>
+                    </div>
+
+                </div>
+
+
+                <div class="route-result">
+
+                    <div>
+                        <strong>Route 116</strong>
+                        <br>
+                        <span>
+                            ${from} → ${to}
+                        </span>
+                    </div>
+
+                    <div>
+                        <strong>41 min</strong>
+                        <br>
+                        <span>
+                            6 stops · Lower demand
+                        </span>
+                    </div>
+
+                </div>
+
+            `;
+        }
+
+    </script>
 
 </body>
 </html>
