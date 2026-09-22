@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Demand Forecast — TransitFlow</title>
+
+    <link rel="stylesheet" href="main.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #07090d;
+            color: #f5f7fa;
+            font-family: Inter, Arial, sans-serif;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        /* ================= NAVBAR ================= */
+
+        .navbar {
+            height: 76px;
+            padding: 0 5%;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            background: rgba(7,9,13,.88);
+            backdrop-filter: blur(18px);
+
+            border-bottom: 1px solid rgba(255,255,255,.07);
+
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .brand-dot {
+            width: 11px;
+            height: 11px;
+
+            border-radius: 50%;
+
+            background: #c7ff55;
+
+            box-shadow: 0 0 18px rgba(199,255,85,.8);
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+        }
+
+        .nav a {
+            color: #858d9b;
+            font-size: 13px;
+        }
+
+        .nav a:hover,
+        .nav a.active {
+            color: white;
+        }
+
+        .nav-btn {
+            padding: 10px 15px;
+
+            border-radius: 9px;
+
+            background: rgba(199,255,85,.08);
+
+            border: 1px solid rgba(199,255,85,.18);
+
+            color: #c7ff55 !important;
+        }
+
+        /* ================= PAGE ================= */
+
+        .page {
+            width: 90%;
+            max-width: 1450px;
+
+            margin: auto;
+
+            padding: 55px 0 100px;
+        }
+
+        .heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+
+            margin-bottom: 32px;
+        }
+
+        .eyebrow {
+            color: #c7ff55;
+
+            font-size: 11px;
+            font-weight: 800;
+
+            letter-spacing: 1.7px;
+
+            text-transform: uppercase;
+
+            margin-bottom: 12px;
+        }
+
+        .heading h1 {
+            font-size: clamp(40px,5vw,62px);
+
+            letter-spacing: -3px;
+
+            line-height: 1;
+        }
+
+        .heading p {
+            color: #858d9b;
+
+            max-width: 650px;
+
+            margin-top: 14px;
+
+            font-size: 14px;
+
+            line-height: 1.7;
+        }
+
+        .model-status {
+
+            padding: 10px 14px;
+
+            border-radius: 9px;
+
+            background: rgba(199,255,85,.05);
+
+            border: 1px solid rgba(199,255,85,.15);
+
+            color: #c7ff55;
+
+            font-size: 11px;
+        }
+
+        /* ================= CONTROLS ================= */
+
+        .controls {
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            padding: 15px 17px;
+
+            border-radius: 14px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(255,255,255,.04),
+                    rgba(255,255,255,.015)
+                );
+
+            border: 1px solid rgba(255,255,255,.08);
+
+            margin-bottom: 16px;
+        }
+
+        .control-left {
+
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .control-label {
+
+            color: #737b89;
+
+            font-size: 11px;
+
+            margin-right: 5px;
+        }
+
+        .range {
+
+            padding: 9px 13px;
+
+            border-radius: 8px;
+
+            border: 1px solid rgba(255,255,255,.07);
+
+            background: rgba(255,255,255,.025);
+
+            color: #858d9b;
+
+            font-size: 11px;
+
+            cursor: pointer;
+
+            transition: .2s;
+        }
+
+        .range:hover,
+        .range.active {
+
+            background: rgba(199,255,85,.1);
+
+            border-color: rgba(199,255,85,.2);
+
+            color: #c7ff55;
+        }
+
+        .model-name {
+
+            color: #737b89;
+
+            font-size: 11px;
+        }
+
+        .model-name strong {
+
+            color: white;
+
+            margin-left: 5px;
+        }
+
+        /* ================= MAIN GRID ================= */
+
+        .forecast-grid {
+
+            display: grid;
+
+            grid-template-columns: 1.7fr .8fr;
+
+            gap: 16px;
+        }
+
+        .panel {
+
+            padding: 24px;
+
+            border-radius: 18px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(255,255,255,.04),
+                    rgba(255,255,255,.015)
+                );
+
+            border: 1px solid rgba(255,255,255,.08);
+        }
+
+        .panel-header {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            margin-bottom: 22px;
+        }
+
+        .panel-header h2 {
+
+            font-size: 16px;
+        }
+
+        .panel-header span {
+
+            color: #6f7785;
+
+            font-size: 10px;
+        }
+
+        .chart-container {
+
+            height: 430px;
+        }
+
+        /* ================= SIDE METRICS ================= */
+
+        .side {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 16px;
+        }
+
+        .metric {
+
+            padding: 22px;
+
+            border-radius: 16px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(255,255,255,.04),
+                    rgba(255,255,255,.015)
+                );
+
+            border: 1px solid rgba(255,255,255,.08);
+        }
+
+        .metric-label {
+
+            color: #737b89;
+
+            font-size: 11px;
+        }
+
+        .metric-value {
+
+            margin-top: 11px;
+
+            font-size: 30px;
+
+            font-weight: 800;
+
+            letter-spacing: -1px;
+        }
+
+        .metric-desc {
+
+            margin-top: 6px;
+
+            color: #c7ff55;
+
+            font-size: 10px;
+        }
+
+        /* ================= CONFIDENCE ================= */
+
+        .confidence {
+
+            padding: 22px;
+
+            border-radius: 16px;
+
+            background:
+                radial-gradient(
+                    circle at 100% 0%,
+                    rgba(199,255,85,.08),
+                    transparent 50%
+                ),
+                #0d1117;
+
+            border: 1px solid rgba(199,255,85,.12);
+        }
+
+        .confidence h3 {
+
+            font-size: 15px;
+
+            margin-bottom: 10px;
+        }
+
+        .confidence p {
+
+            color: #737b89;
+
+            font-size: 11px;
+
+            line-height: 1.6;
+
+            margin-bottom: 18px;
+        }
+
+        .confidence-bar {
+
+            height: 7px;
+
+            border-radius: 99px;
+
+            background: rgba(255,255,255,.07);
+
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+
+            height: 100%;
+
+            width: 87%;
+
+            background: #c7ff55;
+
+            border-radius: 99px;
+
+            box-shadow: 0 0 12px rgba(199,255,85,.5);
+        }
+
+        .confidence-value {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            margin-top: 8px;
+
+            color: #737b89;
+
+            font-size: 10px;
+        }
+
+        .confidence-value strong {
+
+            color: #c7ff55;
+        }
+
+        /* ================= INSIGHT ================= */
+
+        .insight {
+
+            margin-top: 16px;
+
+            padding: 24px;
+
+            border-radius: 17px;
+
+            background:
+                linear-gradient(
+                    120deg,
+                    rgba(199,255,85,.06),
+                    rgba(130,168,255,.04)
+                );
+
+            border: 1px solid rgba(255,255,255,.08);
+
+            display: grid;
+
+            grid-template-columns: auto 1fr;
+
+            gap: 17px;
+
+            align-items: start;
+        }
+
+        .insight-icon {
+
+            width: 40px;
+            height: 40px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 10px;
+
+            background: #c7ff55;
+
+            color: #080a0f;
+
+            font-weight: 900;
+        }
+
+        .insight h3 {
+
+            font-size: 14px;
+
+            margin-bottom: 7px;
+        }
+
+        .insight p {
+
+            color: #858d9b;
+
+            font-size: 12px;
+
+            line-height: 1.7;
+        }
+
+        .insight strong {
+
+            color: white;
+        }
+
+        /* ================= NOTICE ================= */
+
+        .notice {
+
+            margin-top: 16px;
+
+            padding: 14px 16px;
+
+            border-radius: 11px;
+
+            background: rgba(255,255,255,.025);
+
+            border: 1px solid rgba(255,255,255,.06);
+
+            color: #686f7d;
+
+            font-size: 10px;
+
+            line-height: 1.6;
+        }
+
+        .notice span {
+
+            color: #c7ff55;
+
+            font-weight: 800;
+        }
+
+        /* ================= FOOTER ================= */
+
+        footer {
+
+            margin-top: 70px;
+
+            padding-top: 25px;
+
+            border-top: 1px solid rgba(255,255,255,.07);
+
+            display: flex;
+
+            justify-content: space-between;
+
+            color: #626a78;
+
+            font-size: 11px;
+        }
+
+        footer strong {
+            color: #c7ff55;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media(max-width: 1000px) {
+
+            .forecast-grid {
+
+                grid-template-columns: 1fr;
+
+            }
+
+        }
+
+        @media(max-width: 650px) {
+
+            .nav {
+                display: none;
+            }
+
+            .page {
+                width: 92%;
+            }
+
+            .heading {
+
+                flex-direction: column;
+
+                align-items: flex-start;
+
+                gap: 20px;
+
+            }
+
+            .controls {
+
+                flex-direction: column;
+
+                align-items: flex-start;
+
+                gap: 15px;
+
+            }
+
+            .control-left {
+
+                flex-wrap: wrap;
+
+            }
+
+            .chart-container {
+
+                height: 300px;
+
+            }
+
+            footer {
+
+                flex-direction: column;
+
+                gap: 8px;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- ================= NAVBAR ================= -->
+
+<nav class="navbar">
+
+    <a href="index.html" class="brand">
+
+        <span class="brand-dot"></span>
+
+        TransitFlow
+
+    </a>
+
+
+    <div class="nav">
+
+        <a href="index.html">
+            Home
+        </a>
+
+        <a href="dashboard.html">
+            Intelligence
+        </a>
+
+        <a href="routes.html">
+            Transit Map
+        </a>
+
+        <a href="forecasting.html" class="active">
+            Forecast
+        </a>
+
+        <a href="index.html#planner" class="nav-btn">
+            Plan Journey
+        </a>
+
+    </div>
+
+</nav>
+
+
+<!-- ================= PAGE ================= -->
+
+<main class="page">
+
+
+    <!-- HEADER -->
+
+    <section class="heading">
+
+        <div>
+
+            <div class="eyebrow">
+                Demand Forecasting
+            </div>
+
+            <h1>
+                Predict the next movement.
+            </h1>
+
+            <p>
+                Forecast future passenger demand using historical
+                ridership patterns and time-series modelling.
+                Understand where and when the network may become busy.
+            </p>
+
+        </div>
+
+
+        <div class="model-status">
+
+            ● MODEL READY
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= CONTROLS ================= -->
+
+    <section class="controls">
+
+        <div class="control-left">
+
+            <span class="control-label">
+                Forecast horizon
+            </span>
+
+
+            <button
+                class="range active"
+                onclick="setRange(7,this)">
+                7 days
+            </button>
+
+
+            <button
+                class="range"
+                onclick="setRange(14,this)">
+                14 days
+            </button>
+
+
+            <button
+                class="range"
+                onclick="setRange(30,this)">
+                30 days
+            </button>
+
+        </div>
+
+
+        <div class="model-name">
+
+            Model:
+            <strong>ARIMA</strong>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= FORECAST ================= -->
+
+    <section class="forecast-grid">
+
+
+        <!-- CHART -->
+
+        <div class="panel">
+
+            <div class="panel-header">
+
+                <h2>
+                    Ridership forecast
+                </h2>
+
+                <span>
+                    Historical + predicted demand
+                </span>
+
+            </div>
+
+
+            <div class="chart-container">
+
+                <canvas id="forecastChart"></canvas>
+
+            </div>
+
+        </div>
+
+
+        <!-- SIDE -->
+
+        <div class="side">
+
+
+            <div class="metric">
+
+                <div class="metric-label">
+                    Predicted peak
+                </div>
+
+                <div class="metric-value">
+                    08:30
+                </div>
+
+                <div class="metric-desc">
+                    Morning demand window
+                </div>
+
+            </div>
+
+
+            <div class="metric">
+
+                <div class="metric-label">
+                    Expected demand
+                </div>
+
+                <div class="metric-value">
+                    <span id="expectedDemand">
+                        182K
+                    </span>
+                </div>
+
+                <div class="metric-desc">
+                    Passenger journeys
+                </div>
+
+            </div>
+
+
+            <div class="metric">
+
+                <div class="metric-label">
+                    Forecast horizon
+                </div>
+
+                <div class="metric-value">
+                    <span id="horizon">
+                        7
+                    </span>
+                    days
+                </div>
+
+                <div class="metric-desc">
+                    Rolling prediction
+                </div>
+
+            </div>
+
+
+            <!-- CONFIDENCE -->
+
+            <div class="confidence">
+
+                <h3>
+                    Forecast confidence
+                </h3>
+
+                <p>
+                    Confidence represents the consistency of the
+                    model's prediction interval based on the
+                    demonstration dataset.
+                </p>
+
+                <div class="confidence-bar">
+
+                    <div class="confidence-fill"></div>
+
+                </div>
+
+                <div class="confidence-value">
+
+                    <span>
+                        Model confidence
+                    </span>
+
+                    <strong>
+                        87%
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= INSIGHT ================= -->
+
+    <section class="insight">
+
+        <div class="insight-icon">
+            AI
+        </div>
+
+        <div>
+
+            <h3>
+                Forecast insight
+            </h3>
+
+            <p id="forecastInsight">
+
+                The current forecast suggests that passenger
+                demand will be strongest during the
+                <strong>morning commute between 08:00 and 10:00</strong>.
+                Route 204 is expected to experience comparatively
+                higher demand during this period.
+
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= NOTICE ================= -->
+
+    <div class="notice">
+
+        <span>DEMO MODEL ·</span>
+
+        Current predictions use demonstration values for the
+        public website. The production version can replace these
+        values with outputs generated from the project's trained
+        forecasting pipeline and real transit data.
+
+    </div>
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer>
+
+        <div>
+
+            <strong>
+                TransitFlow
+            </strong>
+
+            · Public Transit Intelligence
+
+        </div>
+
+        <div>
+
+            Forecasting · ARIMA · Demand Intelligence
+
+        </div>
+
+    </footer>
+
+
+</main>
+
+
+<script>
+
+    /* =========================================
+       FORECAST DATA
+       ========================================= */
+
+    const chartElement =
+        document.getElementById("forecastChart");
+
+    let forecastChart;
+
+
+    function createForecast(days = 7) {
+
+        const labels = [];
+
+        const historical = [];
+
+        const forecast = [];
+
+        const totalPoints = 12 + days;
+
+
+        /*
+         * Historical values
+         */
+
+        const historicalValues = [
+            118,
+            126,
+            121,
+            137,
+            145,
+            151,
+            143,
+            158,
+            164,
+            159,
+            171,
+            178
+        ];
+
+
+        for (let i = 0; i < 12; i++) {
+
+            labels.push("Day " + (i + 1));
+
+            historical.push(
+                historicalValues[i]
+            );
+
+            forecast.push(null);
+
+        }
+
+
+        /*
+         * Forecast values
+         */
+
+        const lastHistorical =
+            historicalValues[
+                historicalValues.length - 1
+            ];
+
+
+        for (let i = 0; i < days; i++) {
+
+            labels.push(
+                "Day " + (13 + i)
+            );
+
+            historical.push(null);
+
+            const value =
+                Math.round(
+                    lastHistorical +
+                    (i + 1) * 2.3 +
+                    Math.sin(i * 0.8) * 5
+                );
+
+            forecast.push(value);
+
+        }
+
+
+        /*
+         * Remove old chart
+         */
+
+        if (forecastChart) {
+
+            forecastChart.destroy();
+
+        }
+
+
+        /*
+         * Create chart
+         */
+
+        forecastChart = new Chart(
+            chartElement,
+            {
+
+                type: "line",
+
+                data: {
+
+                    labels: labels,
+
+                    datasets: [
+
+                        {
+
+                            label: "Historical",
+
+                            data: historical,
+
+                            borderColor: "#82a8ff",
+
+                            backgroundColor:
+                                "rgba(130,168,255,.07)",
+
+                            borderWidth: 2,
+
+                            pointRadius: 3,
+
+                            tension: .35,
+
+                            fill: true
+
+                        },
+
+                        {
+
+                            label: "Forecast",
+
+                            data: forecast,
+
+                            borderColor: "#c7ff55",
+
+                            backgroundColor:
+                                "rgba(199,255,85,.06)",
+
+                            borderWidth: 2,
+
+                            borderDash: [6,5],
+
+                            pointRadius: 3,
+
+                            tension: .35,
+
+                            fill: true
+
+                        }
+
+                    ]
+
+                },
+
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    interaction: {
+
+                        intersect: false,
+
+                        mode: "index"
+
+                    },
+
+                    plugins: {
+
+                        legend: {
+
+                            labels: {
+
+                                color: "#858d9b",
+
+                                usePointStyle: true,
+
+                                padding: 20
+
+                            }
+
+                        }
+
+                    },
+
+                    scales: {
+
+                        x: {
+
+                            grid: {
+
+                                color:
+                                    "rgba(255,255,255,.04)"
+
+                            },
+
+                            ticks: {
+
+                                color: "#666e7c",
+
+                                maxTicksLimit: 10
+
+                            }
+
+                        },
+
+                        y: {
+
+                            grid: {
+
+                                color:
+                                    "rgba(255,255,255,.04)"
+
+                            },
+
+                            ticks: {
+
+                                color: "#666e7c"
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+        );
+
+
+        /*
+         * Update displayed demand
+         */
+
+        const expected =
+            Math.round(
+                182 +
+                (days - 7) * 1.7
+            );
+
+        document.getElementById(
+            "expectedDemand"
+        ).innerText =
+            expected + "K";
+
+        document.getElementById(
+            "horizon"
+        ).innerText =
+            days;
+
+
+        /*
+         * Update insight
+         */
+
+        document.getElementById(
+            "forecastInsight"
+        ).innerHTML =
+
+            `The current forecast suggests that passenger
+            demand will remain strongest during the
+            <strong>08:00–10:00 morning commute</strong>.
+            With a ${days}-day horizon, Route 204 is expected
+            to experience comparatively higher demand during
+            peak periods.`;
+
+    }
+
+
+    /* =========================================
+       RANGE BUTTONS
+       ========================================= */
+
+    function setRange(days, button) {
+
+        document
+            .querySelectorAll(".range")
+            .forEach(
+                item =>
+                    item.classList.remove("active")
+            );
+
+        button.classList.add("active");
+
+        createForecast(days);
+
+    }
+
+
+    /*
+     * Initial chart
+     */
+
+    createForecast(7);
+
+</script>
+
+
+</body>
+</html>
