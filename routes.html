@@ -1,31 +1,20 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>TransitFlow — Transit Map</title>
+  <title>TransitFlow — CTU Transit Map</title>
 
   <link rel="stylesheet" href="main.css">
 
-  <!-- Leaflet -->
   <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  />
+  >
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      background: #080a0f;
-      color: #f4f5f7;
-      font-family: Arial, sans-serif;
-    }
-
     .map-page {
       padding: 110px 5% 50px;
     }
@@ -34,72 +23,78 @@
       display: flex;
       justify-content: space-between;
       align-items: end;
-      gap: 30px;
+      gap: 25px;
       margin-bottom: 25px;
     }
 
     .eyebrow {
       color: #c7ff55;
-      font-size: 13px;
       letter-spacing: 2px;
       text-transform: uppercase;
+      font-size: 13px;
       margin-bottom: 10px;
     }
 
     .map-header h1 {
-      font-size: clamp(32px, 5vw, 58px);
+      font-size: clamp(34px, 5vw, 58px);
       margin: 0 0 10px;
     }
 
     .map-header p {
       color: #929aaa;
-      max-width: 650px;
+      max-width: 700px;
       line-height: 1.6;
     }
 
     .status {
-      padding: 10px 15px;
+      background: #10131a;
       border: 1px solid #202530;
+      padding: 10px 15px;
       border-radius: 30px;
       color: #c7ff55;
-      background: #10131a;
       white-space: nowrap;
     }
 
     .map-layout {
       display: grid;
-      grid-template-columns: 1fr 330px;
+      grid-template-columns: 1fr 350px;
       gap: 20px;
     }
 
     .map-box {
-      position: relative;
       height: 650px;
-      border: 1px solid #202530;
       border-radius: 22px;
       overflow: hidden;
-      background: #10131a;
+      border: 1px solid #202530;
     }
 
     #transitMap {
-      width: 100%;
       height: 100%;
+      width: 100%;
     }
 
-    .map-panel {
+    .route-panel {
       background: #10131a;
       border: 1px solid #202530;
       border-radius: 22px;
       padding: 22px;
+      overflow-y: auto;
+      max-height: 650px;
     }
 
-    .map-panel h3 {
+    .route-panel h3 {
       margin-top: 0;
+    }
+
+    .source-note {
+      color: #929aaa;
+      font-size: 12px;
+      line-height: 1.5;
       margin-bottom: 20px;
     }
 
     .route-card {
-      padding: 15px;
+      padding: 16px;
       border: 1px solid #202530;
       border-radius: 14px;
       margin-bottom: 12px;
@@ -113,55 +108,45 @@
     }
 
     .route-number {
-      font-size: 20px;
-      font-weight: bold;
-      margin-bottom: 5px;
+      font-size: 19px;
+      font-weight: 700;
+      margin-bottom: 7px;
     }
 
-    .route-name {
+    .route-destination {
       color: #929aaa;
       font-size: 13px;
+      line-height: 1.5;
     }
 
-    .route-dot {
-      display: inline-block;
-      width: 9px;
-      height: 9px;
-      border-radius: 50%;
-      margin-right: 8px;
+    .route-meta {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #c7ff55;
     }
 
     .info-box {
-      margin-top: 25px;
-      padding: 17px;
+      margin-top: 20px;
+      padding: 16px;
+      border: 1px solid #202530;
       background: #0d1016;
       border-radius: 14px;
-      border: 1px solid #202530;
       color: #929aaa;
       line-height: 1.6;
+      font-size: 13px;
     }
 
     .leaflet-popup-content-wrapper,
     .leaflet-popup-tip {
       background: #10131a;
-      color: #f4f5f7;
+      color: #fff;
     }
 
     .leaflet-popup-content {
-      font-family: Arial, sans-serif;
+      line-height: 1.6;
     }
 
-    .popup-title {
-      font-weight: bold;
-      font-size: 16px;
-      margin-bottom: 5px;
-    }
-
-    .popup-text {
-      color: #929aaa;
-    }
-
-    @media (max-width: 900px) {
+    @media(max-width: 900px) {
       .map-layout {
         grid-template-columns: 1fr;
       }
@@ -171,8 +156,12 @@
       }
 
       .map-header {
-        align-items: flex-start;
         flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .route-panel {
+        max-height: none;
       }
     }
   </style>
@@ -180,351 +169,327 @@
 
 <body>
 
-  <!-- NAVBAR -->
-  <nav class="navbar">
-    <div class="brand">TransitFlow</div>
+<nav class="navbar">
 
-    <div class="nav-links">
-      <a href="index.html">Home</a>
-      <a href="dashboard.html">Intelligence</a>
-      <a href="routes.html" class="active">Transit Map</a>
-      <a href="forecasting.html">Forecast</a>
-      <a href="index.html#planner">Plan Journey</a>
+  <div class="brand">
+    TransitFlow
+  </div>
+
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="dashboard.html">Intelligence</a>
+    <a href="routes.html" class="active">Transit Map</a>
+    <a href="forecasting.html">Forecast</a>
+    <a href="index.html#planner">Plan Journey</a>
+  </div>
+
+</nav>
+
+
+<main class="map-page">
+
+  <section class="map-header">
+
+    <div>
+
+      <div class="eyebrow">
+        Chandigarh Transport Undertaking
+      </div>
+
+      <h1>
+        Explore the CTU network.
+      </h1>
+
+      <p>
+        TransitFlow visualizes publicly documented CTU local and
+        Tricity bus routes over the real Chandigarh region.
+      </p>
+
     </div>
-  </nav>
 
+    <div class="status">
+      ● CTU DATA
+    </div>
 
-  <main class="map-page">
+  </section>
 
-    <!-- HEADER -->
-    <section class="map-header">
 
-      <div>
-        <div class="eyebrow">Transit Network</div>
+  <section class="map-layout">
 
-        <h1>Explore the network.</h1>
 
-        <p>
-          Explore routes, stops and transit connections across the
-          Chandigarh Tricity network.
-        </p>
-      </div>
+    <!-- MAP -->
 
-      <div class="status">
-        ● DEMO NETWORK
-      </div>
+    <div class="map-box">
+      <div id="transitMap"></div>
+    </div>
 
-    </section>
 
+    <!-- ROUTES -->
 
-    <!-- MAP + ROUTES -->
-    <section class="map-layout">
+    <aside class="route-panel">
 
-      <!-- MAP -->
-      <div class="map-box">
-        <div id="transitMap"></div>
-      </div>
+      <h3>
+        CTU Routes
+      </h3>
 
+      <div class="source-note">
 
-      <!-- ROUTE SIDEBAR -->
-      <aside class="map-panel">
-
-        <h3>Routes</h3>
-
-        <div
-          class="route-card"
-          onclick="showRoute(route204)"
-        >
-          <div class="route-number">
-            <span class="route-dot" style="background:#c7ff55;"></span>
-            Route 204
-          </div>
-
-          <div class="route-name">
-            Chandigarh → Mohali
-          </div>
-        </div>
-
-
-        <div
-          class="route-card"
-          onclick="showRoute(route116)"
-        >
-          <div class="route-number">
-            <span class="route-dot" style="background:#82a8ff;"></span>
-            Route 116
-          </div>
-
-          <div class="route-name">
-            Chandigarh → Panchkula
-          </div>
-        </div>
-
-
-        <div
-          class="route-card"
-          onclick="showRoute(route23)"
-        >
-          <div class="route-number">
-            <span class="route-dot" style="background:#ff9d5c;"></span>
-            Route 23
-          </div>
-
-          <div class="route-name">
-            Sector 17 → Sector 34
-          </div>
-        </div>
-
-
-        <div
-          class="route-card"
-          onclick="showRoute(route45)"
-        >
-          <div class="route-number">
-            <span class="route-dot" style="background:#d58cff;"></span>
-            Route 45
-          </div>
-
-          <div class="route-name">
-            Chandigarh → Airport
-          </div>
-        </div>
-
-
-        <div class="info-box" id="routeInfo">
-          <strong>Select a route</strong>
-          <br>
-          Click any route above to highlight it on the map.
-        </div>
-
-      </aside>
-
-    </section>
-
-  </main>
-
-
-  <!-- LEAFLET -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-
-  <script>
-
-    /*
-      DEMO ROUTE DATA
-
-      Later we will replace these coordinates
-      with your actual transit dataset.
-    */
-
-
-    const route204 = {
-      name: "Route 204",
-      color: "#c7ff55",
-
-      stops: [
-        ["Sector 17", 30.7415, 76.7680],
-        ["Sector 22", 30.7330, 76.7750],
-        ["Sector 34", 30.7270, 76.7600],
-        ["Mohali Phase 7", 30.7046, 76.7179]
-      ]
-    };
-
-
-    const route116 = {
-      name: "Route 116",
-      color: "#82a8ff",
-
-      stops: [
-        ["Sector 17", 30.7415, 76.7680],
-        ["Sector 9", 30.7500, 76.7900],
-        ["Panchkula", 30.6942, 76.8606]
-      ]
-    };
-
-
-    const route23 = {
-      name: "Route 23",
-      color: "#ff9d5c",
-
-      stops: [
-        ["Sector 17", 30.7415, 76.7680],
-        ["Sector 22", 30.7330, 76.7750],
-        ["Sector 34", 30.7270, 76.7600]
-      ]
-    };
-
-
-    const route45 = {
-      name: "Route 45",
-      color: "#d58cff",
-
-      stops: [
-        ["Sector 17", 30.7415, 76.7680],
-        ["Industrial Area", 30.7050, 76.8000],
-        ["Airport", 30.6735, 76.7885]
-      ]
-    };
-
-
-    /*
-      MAP
-    */
-
-    const map = L.map("transitMap").setView(
-      [30.7250, 76.7750],
-      12
-    );
-
-
-    /*
-      OpenStreetMap
-    */
-
-    L.tileLayer(
-      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-      {
-        maxZoom: 19,
-        attribution: "&copy; OpenStreetMap contributors"
-      }
-    ).addTo(map);
-
-
-    /*
-      Store route layers
-    */
-
-    const routeLayers = [];
-
-
-    /*
-      Draw route function
-    */
-
-    function drawRoute(route) {
-
-      const coordinates = route.stops.map(
-        stop => [stop[1], stop[2]]
-      );
-
-
-      const line = L.polyline(
-        coordinates,
-        {
-          color: route.color,
-          weight: 5,
-          opacity: 0.85
-        }
-      ).addTo(map);
-
-
-      routeLayers.push(line);
-
-
-      /*
-        Add stops
-      */
-
-      route.stops.forEach((stop, index) => {
-
-        const marker = L.circleMarker(
-          [stop[1], stop[2]],
-          {
-            radius: 7,
-            color: route.color,
-            fillColor: route.color,
-            fillOpacity: 1,
-            weight: 2
-          }
-        ).addTo(map);
-
-
-        marker.bindPopup(`
-          <div class="popup-title">
-            ${stop[0]}
-          </div>
-
-          <div class="popup-text">
-            ${route.name}<br>
-            Stop ${index + 1} of ${route.stops.length}
-          </div>
-        `);
-
-      });
-
-    }
-
-
-    /*
-      Draw all routes
-    */
-
-    drawRoute(route204);
-    drawRoute(route116);
-    drawRoute(route23);
-    drawRoute(route45);
-
-
-    /*
-      Show selected route
-    */
-
-    function showRoute(route) {
-
-      routeLayers.forEach(layer => {
-
-        layer.setStyle({
-          opacity: 0.15,
-          weight: 4
-        });
-
-      });
-
-
-      const coordinates = route.stops.map(
-        stop => [stop[1], stop[2]]
-      );
-
-
-      const selectedLine = L.polyline(
-        coordinates,
-        {
-          color: route.color,
-          weight: 8,
-          opacity: 1
-        }
-      ).addTo(map);
-
-
-      map.fitBounds(selectedLine.getBounds(), {
-        padding: [40, 40]
-      });
-
-
-      document.getElementById("routeInfo").innerHTML = `
-
-        <strong>${route.name}</strong>
+        Route information sourced from the official
+        Chandigarh Transport Undertaking timetable.
 
         <br><br>
 
-        Stops:
-        ${route.stops.length}
+        Current reference:
+        Local & Tricity services timetable,
+        24 March 2025.
 
-        <br>
+      </div>
 
-        Network status:
-        Active
 
-        <br>
+      <!-- ROUTE 4C -->
 
-        Data:
-        Demonstration
+      <div class="route-card" onclick="showRoute('4C')">
 
-      `;
+        <div class="route-number">
+          Route 4C
+        </div>
 
-    }
+        <div class="route-destination">
+          ISBT-43 → ISBT-43
+        </div>
 
-  </script>
+        <div class="route-meta">
+          32.5 km · 4 buses · 25–30 min frequency
+        </div>
 
-</body>
-</html>
+      </div>
+
+
+      <!-- ROUTE 5A -->
+
+      <div class="route-card" onclick="showRoute('5A')">
+
+        <div class="route-number">
+          Route 5A
+        </div>
+
+        <div class="route-destination">
+          Ram Darbar → Ram Darbar
+        </div>
+
+        <div class="route-meta">
+          Circular local service
+        </div>
+
+      </div>
+
+
+      <!-- ROUTE 7 -->
+
+      <div class="route-card" onclick="showRoute('7')">
+
+        <div class="route-number">
+          Route 7
+        </div>
+
+        <div class="route-destination">
+          New Maloya Colony → Ramdarbar
+        </div>
+
+        <div class="route-meta">
+          21.5 km · 6 buses · 25 min frequency
+        </div>
+
+      </div>
+
+
+      <!-- ROUTE 9A -->
+
+      <div class="route-card" onclick="showRoute('9A')">
+
+        <div class="route-number">
+          Route 9A
+        </div>
+
+        <div class="route-destination">
+          Mansa Devi → Mansa Devi
+        </div>
+
+        <div class="route-meta">
+          37 km · 4 buses · 30 min frequency
+        </div>
+
+      </div>
+
+
+      <!-- ROUTE 9C -->
+
+      <div class="route-card" onclick="showRoute('9C')">
+
+        <div class="route-number">
+          Route 9C
+        </div>
+
+        <div class="route-destination">
+          Mansa Devi → Mansa Devi
+        </div>
+
+        <div class="route-meta">
+          37 km · 4 buses · 30 min frequency
+        </div>
+
+      </div>
+
+
+      <!-- ROUTE 35A -->
+
+      <div class="route-card" onclick="showRoute('35A')">
+
+        <div class="route-number">
+          Route 35A
+        </div>
+
+        <div class="route-destination">
+          ISBT-17 → Sector-123
+        </div>
+
+        <div class="route-meta">
+          23 km · 4 buses · 40 min frequency
+        </div>
+
+      </div>
+
+
+      <!-- ROUTE 35B -->
+
+      <div class="route-card" onclick="showRoute('35B')">
+
+        <div class="route-number">
+          Route 35B
+        </div>
+
+        <div class="route-destination">
+          ISBT-17 → Kharar
+        </div>
+
+        <div class="route-meta">
+          19.2 km · 7 buses · 20 min frequency
+        </div>
+
+      </div>
+
+
+      <!-- ROUTE 37 -->
+
+      <div class="route-card" onclick="showRoute('37')">
+
+        <div class="route-number">
+          Route 37 — Night/S
+        </div>
+
+        <div class="route-destination">
+          ISBT-43 → Manimajra
+        </div>
+
+        <div class="route-meta">
+          Night service · 50 min frequency
+        </div>
+
+      </div>
+
+
+      <!-- ROUTE 38 -->
+
+      <div class="route-card" onclick="showRoute('38')">
+
+        <div class="route-number">
+          Route 38
+        </div>
+
+        <div class="route-destination">
+          PGI → Jheurherri
+        </div>
+
+        <div class="route-meta">
+          27 km · 3 buses · 60 min frequency
+        </div>
+
+      </div>
+
+
+      <div class="info-box" id="routeInfo">
+
+        <strong>Select a CTU route.</strong>
+
+        <br><br>
+
+        The selected route will be highlighted on the map.
+
+      </div>
+
+    </aside>
+
+  </section>
+
+</main>
+
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+
+<script>
+
+/*
+===========================================
+REAL CHANDIGARH BASE MAP
+===========================================
+*/
+
+const map = L.map("transitMap").setView(
+  [30.7333, 76.7794],
+  12
+);
+
+
+L.tileLayer(
+  "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+  {
+    maxZoom: 19,
+    attribution: "&copy; OpenStreetMap contributors"
+  }
+).addTo(map);
+
+
+/*
+===========================================
+IMPORTANT
+
+These are geographic anchor points for
+major CTU locations.
+
+The route information itself comes from
+the official CTU timetable.
+
+We are NOT claiming these are live GPS
+positions.
+===========================================
+*/
+
+const places = {
+
+  "ISBT-17": [30.7412, 76.7825],
+
+  "ISBT-43": [30.7095, 76.7650],
+
+  "Sector-17": [30.7410, 76.7830],
+
+  "PGI": [30.7645, 76.7750],
+
+  "Sector-22": [30.7300, 76.7720],
+
+  "Sector-35": [30.7160, 76.7580],
+
+  "Sector-43": [30.7080, 76.7650],
+
+  "Sector-
+```
