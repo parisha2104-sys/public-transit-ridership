@@ -1,0 +1,86 @@
+{
+  "source": {
+    "operator": "Chandigarh Transport Undertaking (CTU)",
+    "source_type": "Official CTU timetable",
+    "source_date": "2025-03-24",
+    "source_url": "https://chdctu.gov.in/sites/default/files/2025-03/TimeTableLocal_060425.pdf",
+    "note": "Route information is based on CTU-published timetable data. Map geometry and coordinates are handled separately."
+  },
+
+  "routes": [
+    {
+      "route_id": "35A",
+      "name": "35A",
+      "operator": "CTU",
+      "type": "Local / Tri-City",
+      "origin": "ISBT-17",
+      "destination": "Sector-123",
+      "frequency_minutes": 40,
+      "distance_km": 23,
+      "buses": 4,
+
+      "stops": [
+        "ISBT-17",
+        "16/17",
+        "16/10",
+        "11/15",
+        "PEC",
+        "New OPD",
+        "PGI",
+        "14/15",
+        "24/25",
+        "37/38",
+        "40/41",
+        "P.B. Barrier",
+        "Balongi",
+        "Daun",
+        "KFC",
+        "Jalvayu Tower",
+        "Sector-124/125",
+        "Sector-123"
+      ],
+
+      "service": {
+        "outbound": "ISBT-17 to Sector-123",
+        "return": "Sector-123 towards ISBT-17",
+        "operating_window": "06:00 AM onwards"
+      }
+    },
+
+    {
+      "route_id": "35B",
+      "name": "35B",
+      "operator": "CTU",
+      "type": "Local / Tri-City",
+      "origin": "ISBT-17",
+      "destination": "Kharar",
+      "frequency_minutes": 20,
+      "distance_km": 19.2,
+      "buses": 7,
+
+      "stops": [
+        "ISBT-17",
+        "Aroma",
+        "Sector-35/22",
+        "Kissan Bhawan",
+        "35/36",
+        "Atawa",
+        "ISBT-43",
+        "F/Chowk",
+        "Phase-2",
+        "Phase-6",
+        "Balongi",
+        "Daun",
+        "Desu Majra",
+        "Mundi Kharar",
+        "Kharar"
+      ],
+
+      "service": {
+        "outbound": "ISBT-17 to Kharar",
+        "return": "Kharar towards ISBT-17",
+        "operating_window": "05:20 AM onwards"
+      }
+    }
+  ]
+}
