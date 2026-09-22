@@ -1,495 +1,524 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>TransitFlow — CTU Transit Map</title>
+    <title>TransitFlow — CTU Routes</title>
 
-  <link rel="stylesheet" href="main.css">
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    >
 
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  >
+    <link rel="stylesheet" href="main.css">
 
-  <style>
-    .map-page {
-      padding: 110px 5% 50px;
-    }
+    <style>
+        body {
+            margin: 0;
+            background: #07100d;
+            color: #f5f7f6;
+            font-family: Arial, sans-serif;
+        }
 
-    .map-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: end;
-      gap: 25px;
-      margin-bottom: 25px;
-    }
+        .routes-page {
+            display: grid;
+            grid-template-columns: 340px 1fr;
+            height: calc(100vh - 72px);
+        }
 
-    .eyebrow {
-      color: #c7ff55;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      font-size: 13px;
-      margin-bottom: 10px;
-    }
+        .route-sidebar {
+            background: #0b1512;
+            border-right: 1px solid rgba(255,255,255,0.08);
+            padding: 24px;
+            overflow-y: auto;
+        }
 
-    .map-header h1 {
-      font-size: clamp(34px, 5vw, 58px);
-      margin: 0 0 10px;
-    }
+        .route-sidebar h2 {
+            margin-top: 0;
+            font-size: 24px;
+        }
 
-    .map-header p {
-      color: #929aaa;
-      max-width: 700px;
-      line-height: 1.6;
-    }
+        .route-sidebar p {
+            color: #91a09a;
+            font-size: 14px;
+            line-height: 1.5;
+        }
 
-    .status {
-      background: #10131a;
-      border: 1px solid #202530;
-      padding: 10px 15px;
-      border-radius: 30px;
-      color: #c7ff55;
-      white-space: nowrap;
-    }
+        .source-badge {
+            display: inline-block;
+            margin: 12px 0 20px;
+            padding: 7px 10px;
+            border-radius: 20px;
+            background: rgba(169,255,92,0.10);
+            color: #a9ff5c;
+            font-size: 12px;
+        }
 
-    .map-layout {
-      display: grid;
-      grid-template-columns: 1fr 350px;
-      gap: 20px;
-    }
+        .route-card {
+            padding: 17px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            background: #101c18;
+            cursor: pointer;
+            transition: 0.2s;
+        }
 
-    .map-box {
-      height: 650px;
-      border-radius: 22px;
-      overflow: hidden;
-      border: 1px solid #202530;
-    }
+        .route-card:hover,
+        .route-card.active {
+            border-color: #a9ff5c;
+            transform: translateY(-2px);
+        }
 
-    #transitMap {
-      height: 100%;
-      width: 100%;
-    }
+        .route-number {
+            font-size: 22px;
+            font-weight: bold;
+            color: #a9ff5c;
+        }
 
-    .route-panel {
-      background: #10131a;
-      border: 1px solid #202530;
-      border-radius: 22px;
-      padding: 22px;
-      overflow-y: auto;
-      max-height: 650px;
-    }
+        .route-name {
+            margin-top: 6px;
+            font-size: 14px;
+        }
 
-    .route-panel h3 {
-      margin-top: 0;
-    }
+        .route-meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 14px;
+        }
 
-    .source-note {
-      color: #929aaa;
-      font-size: 12px;
-      line-height: 1.5;
-      margin-bottom: 20px;
-    }
+        .meta-box {
+            background: #07100d;
+            padding: 9px;
+            border-radius: 8px;
+        }
 
-    .route-card {
-      padding: 16px;
-      border: 1px solid #202530;
-      border-radius: 14px;
-      margin-bottom: 12px;
-      cursor: pointer;
-      transition: .2s;
-    }
+        .meta-label {
+            display: block;
+            color: #73817b;
+            font-size: 10px;
+            text-transform: uppercase;
+        }
 
-    .route-card:hover {
-      border-color: #c7ff55;
-      transform: translateY(-2px);
-    }
+        .meta-value {
+            display: block;
+            margin-top: 3px;
+            font-size: 13px;
+        }
 
-    .route-number {
-      font-size: 19px;
-      font-weight: 700;
-      margin-bottom: 7px;
-    }
+        #map {
+            width: 100%;
+            height: 100%;
+            background: #111;
+        }
 
-    .route-destination {
-      color: #929aaa;
-      font-size: 13px;
-      line-height: 1.5;
-    }
+        .route-details {
+            position: absolute;
+            z-index: 1000;
+            right: 25px;
+            bottom: 25px;
+            width: 330px;
+            padding: 20px;
+            background: rgba(8,17,14,0.94);
+            border: 1px solid rgba(255,255,255,0.10);
+            border-radius: 16px;
+            backdrop-filter: blur(12px);
+        }
 
-    .route-meta {
-      margin-top: 10px;
-      font-size: 12px;
-      color: #c7ff55;
-    }
+        .route-details h3 {
+            margin: 0 0 8px;
+            color: #a9ff5c;
+        }
 
-    .info-box {
-      margin-top: 20px;
-      padding: 16px;
-      border: 1px solid #202530;
-      background: #0d1016;
-      border-radius: 14px;
-      color: #929aaa;
-      line-height: 1.6;
-      font-size: 13px;
-    }
+        .route-details p {
+            margin: 7px 0;
+            color: #b7c1bc;
+            font-size: 13px;
+        }
 
-    .leaflet-popup-content-wrapper,
-    .leaflet-popup-tip {
-      background: #10131a;
-      color: #fff;
-    }
+        .stop-list {
+            margin-top: 14px;
+            max-height: 180px;
+            overflow-y: auto;
+        }
 
-    .leaflet-popup-content {
-      line-height: 1.6;
-    }
+        .stop {
+            padding: 7px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 12px;
+            color: #dce4df;
+        }
 
-    @media(max-width: 900px) {
-      .map-layout {
-        grid-template-columns: 1fr;
-      }
+        .stop::before {
+            content: "●";
+            color: #a9ff5c;
+            margin-right: 8px;
+        }
 
-      .map-box {
-        height: 500px;
-      }
+        .leaflet-popup-content-wrapper,
+        .leaflet-popup-tip {
+            background: #101c18;
+            color: white;
+        }
 
-      .map-header {
-        flex-direction: column;
-        align-items: flex-start;
-      }
+        .leaflet-control-attribution {
+            background: rgba(0,0,0,0.7) !important;
+            color: #aaa;
+        }
 
-      .route-panel {
-        max-height: none;
-      }
-    }
-  </style>
+        @media (max-width: 850px) {
+            .routes-page {
+                grid-template-columns: 1fr;
+                grid-template-rows: 380px 1fr;
+            }
+
+            .route-sidebar {
+                order: 2;
+            }
+
+            #map {
+                order: 1;
+            }
+
+            .route-details {
+                display: none;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-<nav class="navbar">
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="logo">TransitFlow</div>
 
-  <div class="brand">
-    TransitFlow
-  </div>
-
-  <div class="nav-links">
-    <a href="index.html">Home</a>
-    <a href="dashboard.html">Intelligence</a>
-    <a href="routes.html" class="active">Transit Map</a>
-    <a href="forecasting.html">Forecast</a>
-    <a href="index.html#planner">Plan Journey</a>
-  </div>
-
-</nav>
-
-
-<main class="map-page">
-
-  <section class="map-header">
-
-    <div>
-
-      <div class="eyebrow">
-        Chandigarh Transport Undertaking
-      </div>
-
-      <h1>
-        Explore the CTU network.
-      </h1>
-
-      <p>
-        TransitFlow visualizes publicly documented CTU local and
-        Tricity bus routes over the real Chandigarh region.
-      </p>
-
-    </div>
-
-    <div class="status">
-      ● CTU DATA
-    </div>
-
-  </section>
-
-
-  <section class="map-layout">
-
-
-    <!-- MAP -->
-
-    <div class="map-box">
-      <div id="transitMap"></div>
-    </div>
-
-
-    <!-- ROUTES -->
-
-    <aside class="route-panel">
-
-      <h3>
-        CTU Routes
-      </h3>
-
-      <div class="source-note">
-
-        Route information sourced from the official
-        Chandigarh Transport Undertaking timetable.
-
-        <br><br>
-
-        Current reference:
-        Local & Tricity services timetable,
-        24 March 2025.
-
-      </div>
-
-
-      <!-- ROUTE 4C -->
-
-      <div class="route-card" onclick="showRoute('4C')">
-
-        <div class="route-number">
-          Route 4C
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="dashboard.html">Intelligence</a>
+            <a href="routes.html">Transit Map</a>
+            <a href="forecasting.html">Forecast</a>
+            <a href="index.html#planner">Plan Journey</a>
         </div>
+    </nav>
 
-        <div class="route-destination">
-          ISBT-43 → ISBT-43
-        </div>
 
-        <div class="route-meta">
-          32.5 km · 4 buses · 25–30 min frequency
-        </div>
+    <!-- ROUTES + MAP -->
+    <main class="routes-page">
 
-      </div>
+        <!-- SIDEBAR -->
+        <aside class="route-sidebar">
 
+            <h2>CTU Network</h2>
 
-      <!-- ROUTE 5A -->
+            <p>
+                Chandigarh Transport Undertaking routes
+                based on published CTU timetable information.
+            </p>
 
-      <div class="route-card" onclick="showRoute('5A')">
+            <span class="source-badge">
+                ● OFFICIAL CTU DATA
+            </span>
 
-        <div class="route-number">
-          Route 5A
-        </div>
+            <div id="routeList">
+                Loading routes...
+            </div>
 
-        <div class="route-destination">
-          Ram Darbar → Ram Darbar
-        </div>
+        </aside>
 
-        <div class="route-meta">
-          Circular local service
-        </div>
 
-      </div>
+        <!-- MAP -->
+        <section style="position:relative;">
 
+            <div id="map"></div>
 
-      <!-- ROUTE 7 -->
+            <div class="route-details" id="routeDetails">
+                <h3>Select a route</h3>
+                <p>
+                    Choose a CTU route from the left panel
+                    to view its published route information.
+                </p>
+            </div>
 
-      <div class="route-card" onclick="showRoute('7')">
+        </section>
 
-        <div class="route-number">
-          Route 7
-        </div>
+    </main>
 
-        <div class="route-destination">
-          New Maloya Colony → Ramdarbar
-        </div>
 
-        <div class="route-meta">
-          21.5 km · 6 buses · 25 min frequency
-        </div>
+    <!-- LEAFLET -->
+    <script
+        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+    </script>
 
-      </div>
 
+    <script>
 
-      <!-- ROUTE 9A -->
+        let map;
+        let routeData = [];
+        let activeRoute = null;
 
-      <div class="route-card" onclick="showRoute('9A')">
+        let routeLayer = null;
 
-        <div class="route-number">
-          Route 9A
-        </div>
 
-        <div class="route-destination">
-          Mansa Devi → Mansa Devi
-        </div>
+        /*
+        --------------------------------------------------
+        INITIALIZE MAP
+        --------------------------------------------------
+        */
 
-        <div class="route-meta">
-          37 km · 4 buses · 30 min frequency
-        </div>
+        map = L.map("map").setView(
+            [30.7333, 76.7794],
+            12
+        );
 
-      </div>
 
+        L.tileLayer(
+            "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+            {
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap contributors'
+            }
+        ).addTo(map);
 
-      <!-- ROUTE 9C -->
 
-      <div class="route-card" onclick="showRoute('9C')">
+        /*
+        --------------------------------------------------
+        LOAD REAL CTU JSON
+        --------------------------------------------------
+        */
 
-        <div class="route-number">
-          Route 9C
-        </div>
+        fetch("data/routes.json")
 
-        <div class="route-destination">
-          Mansa Devi → Mansa Devi
-        </div>
+            .then(response => {
 
-        <div class="route-meta">
-          37 km · 4 buses · 30 min frequency
-        </div>
+                if (!response.ok) {
+                    throw new Error("routes.json not found");
+                }
 
-      </div>
+                return response.json();
+            })
 
+            .then(data => {
 
-      <!-- ROUTE 35A -->
+                routeData = data.routes;
 
-      <div class="route-card" onclick="showRoute('35A')">
+                renderRoutes(routeData);
 
-        <div class="route-number">
-          Route 35A
-        </div>
+            })
 
-        <div class="route-destination">
-          ISBT-17 → Sector-123
-        </div>
+            .catch(error => {
 
-        <div class="route-meta">
-          23 km · 4 buses · 40 min frequency
-        </div>
+                console.error(error);
 
-      </div>
+                document.getElementById("routeList").innerHTML = `
+                    <div style="
+                        color:#ff7b7b;
+                        padding:15px;
+                        background:#1c1111;
+                        border-radius:10px;
+                    ">
+                        Unable to load CTU route data.
+                        <br><br>
+                        Check that:
+                        <br>
+                        <b>data/routes.json</b>
+                        <br>
+                        exists in your GitHub repository.
+                    </div>
+                `;
 
+            });
 
-      <!-- ROUTE 35B -->
 
-      <div class="route-card" onclick="showRoute('35B')">
+        /*
+        --------------------------------------------------
+        CREATE ROUTE CARDS
+        --------------------------------------------------
+        */
 
-        <div class="route-number">
-          Route 35B
-        </div>
+        function renderRoutes(routes) {
 
-        <div class="route-destination">
-          ISBT-17 → Kharar
-        </div>
+            const container =
+                document.getElementById("routeList");
 
-        <div class="route-meta">
-          19.2 km · 7 buses · 20 min frequency
-        </div>
+            container.innerHTML = "";
 
-      </div>
+            routes.forEach((route, index) => {
 
+                const card =
+                    document.createElement("div");
 
-      <!-- ROUTE 37 -->
+                card.className = "route-card";
 
-      <div class="route-card" onclick="showRoute('37')">
+                card.innerHTML = `
 
-        <div class="route-number">
-          Route 37 — Night/S
-        </div>
+                    <div class="route-number">
+                        ${route.route_id}
+                    </div>
 
-        <div class="route-destination">
-          ISBT-43 → Manimajra
-        </div>
+                    <div class="route-name">
+                        ${route.origin}
+                        →
+                        ${route.destination}
+                    </div>
 
-        <div class="route-meta">
-          Night service · 50 min frequency
-        </div>
+                    <div class="route-meta">
 
-      </div>
+                        <div class="meta-box">
+                            <span class="meta-label">
+                                Frequency
+                            </span>
 
+                            <span class="meta-value">
+                                ${route.frequency_minutes} min
+                            </span>
+                        </div>
 
-      <!-- ROUTE 38 -->
+                        <div class="meta-box">
+                            <span class="meta-label">
+                                Distance
+                            </span>
 
-      <div class="route-card" onclick="showRoute('38')">
+                            <span class="meta-value">
+                                ${route.distance_km} km
+                            </span>
+                        </div>
 
-        <div class="route-number">
-          Route 38
-        </div>
+                        <div class="meta-box">
+                            <span class="meta-label">
+                                Buses
+                            </span>
 
-        <div class="route-destination">
-          PGI → Jheurherri
-        </div>
+                            <span class="meta-value">
+                                ${route.buses}
+                            </span>
+                        </div>
 
-        <div class="route-meta">
-          27 km · 3 buses · 60 min frequency
-        </div>
+                        <div class="meta-box">
+                            <span class="meta-label">
+                                Operator
+                            </span>
 
-      </div>
+                            <span class="meta-value">
+                                ${route.operator}
+                            </span>
+                        </div>
 
+                    </div>
+                `;
 
-      <div class="info-box" id="routeInfo">
 
-        <strong>Select a CTU route.</strong>
+                card.addEventListener(
+                    "click",
+                    () => selectRoute(route, card)
+                );
 
-        <br><br>
 
-        The selected route will be highlighted on the map.
+                container.appendChild(card);
 
-      </div>
+            });
 
-    </aside>
+        }
 
-  </section>
 
-</main>
+        /*
+        --------------------------------------------------
+        SELECT ROUTE
+        --------------------------------------------------
+        */
 
+        function selectRoute(route, card) {
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+            activeRoute = route;
 
+            document
+                .querySelectorAll(".route-card")
+                .forEach(el =>
+                    el.classList.remove("active")
+                );
 
-<script>
+            card.classList.add("active");
 
-/*
-===========================================
-REAL CHANDIGARH BASE MAP
-===========================================
-*/
 
-const map = L.map("transitMap").setView(
-  [30.7333, 76.7794],
-  12
-);
+            showRouteDetails(route);
 
+        }
 
-L.tileLayer(
-  "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-  {
-    maxZoom: 19,
-    attribution: "&copy; OpenStreetMap contributors"
-  }
-).addTo(map);
 
+        /*
+        --------------------------------------------------
+        ROUTE DETAILS
+        --------------------------------------------------
+        */
 
-/*
-===========================================
-IMPORTANT
+        function showRouteDetails(route) {
 
-These are geographic anchor points for
-major CTU locations.
+            const details =
+                document.getElementById("routeDetails");
 
-The route information itself comes from
-the official CTU timetable.
+            details.innerHTML = `
 
-We are NOT claiming these are live GPS
-positions.
-===========================================
-*/
+                <h3>Route ${route.route_id}</h3>
 
-const places = {
+                <p>
+                    <strong>${route.origin}</strong>
+                    →
+                    <strong>${route.destination}</strong>
+                </p>
 
-  "ISBT-17": [30.7412, 76.7825],
+                <p>
+                    Frequency:
+                    <strong>
+                        ${route.frequency_minutes} minutes
+                    </strong>
+                </p>
 
-  "ISBT-43": [30.7095, 76.7650],
+                <p>
+                    Distance:
+                    <strong>
+                        ${route.distance_km} km
+                    </strong>
+                </p>
 
-  "Sector-17": [30.7410, 76.7830],
+                <p>
+                    Fleet assigned:
+                    <strong>
+                        ${route.buses} buses
+                    </strong>
+                </p>
 
-  "PGI": [30.7645, 76.7750],
+                <p>
+                    Operator:
+                    <strong>
+                        ${route.operator}
+                    </strong>
+                </p>
 
-  "Sector-22": [30.7300, 76.7720],
+                <div class="stop-list">
 
-  "Sector-35": [30.7160, 76.7580],
+                    <strong style="
+                        display:block;
+                        margin-bottom:8px;
+                    ">
+                        Published route sequence
+                    </strong>
 
-  "Sector-43": [30.7080, 76.7650],
+                    ${route.stops.map(
+                        stop => `
+                            <div class="stop">
+                                ${stop}
+                            </div>
+                        `
+                    ).join("")}
 
-  "Sector-
-```
+                </div>
+            `;
+
+        }
+
+    </script>
+
+</body>
+</html>
