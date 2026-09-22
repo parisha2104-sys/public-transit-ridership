@@ -1,161 +1,71 @@
 {
   "source": {
-    "operator": "Chandigarh Transport Undertaking (CTU)",
-    "source_type": "Official CTU timetable",
-    "note": "Stop names are taken from published CTU route information. Coordinates are intentionally left unassigned until verified against OpenStreetMap."
+    "operator": "Chandigarh Transport Undertaking",
+    "data_type": "Published route information",
+    "verified_against": "CTU Local Timetable dated 24.03.2025"
   },
 
-  "stops": [
-    {
-      "stop_id": "CTU-001",
+  "stops": {
+
+    "ISBT-17": {
       "name": "ISBT-17",
-      "coordinates": null
-    },
-    {
-      "stop_id": "CTU-002",
-      "name": "16/17",
-      "coordinates": null
-    },
-    {
-      "stop_id": "CTU-003",
-      "name": "16/10",
-      "coordinates": null
-    },
-    {
-      "stop_id": "CTU-004",
-      "name": "11/15",
-      "coordinates": null
-    },
-    {
-      "stop_id": "CTU-005",
-      "name": "PEC",
-      "coordinates": null
-    },
-    {
-      "stop_id": "CTU-006",
-      "name": "New OPD",
-      "coordinates": null
-    },
-    {
-      "stop_id": "CTU-007",
-      "name": "PGI",
-      "coordinates": null
-    },
-    {
-      "stop_id": "CTU-008",
-      "name": "14/15",
-      "coordinates": null
-    },
-    {
-      "stop_id": "CTU-009",
-      "name": "24/25",
-      "coordinates": null
-    },
-    {
-      "stop_id": "CTU-010",
-      "name": "37/38",
-      "coordinates": null
-    },
-    {
-      "stop_id": "CTU-011",
-      "name": "40/41",
-      "coordinates": null
-    },
-    {
-      "stop_id": "CTU-012",
-      "name": "P.B. Barrier",
-      "coordinates": null
-    },
-    {
-      "stop_id": "CTU-013",
-      "name": "Balongi",
-      "coordinates": null
-    },
-    {
-      "stop_id": "CTU-014",
-      "name": "Daun",
-      "coordinates": null
-    },
-    {
-      "stop_id": "CTU-015",
-      "name": "KFC",
-      "coordinates": null
-    },
-    {
-      "stop_id": "CTU-016",
-      "name": "Jalvayu Tower",
-      "coordinates": null
-    },
-    {
-      "stop_id": "CTU-017",
-      "name": "Sector-124/125",
-      "coordinates": null
-    },
-    {
-      "stop_id": "CTU-018",
-      "name": "Sector-123",
-      "coordinates": null
+      "lat": 30.7412,
+      "lng": 76.7827
     },
 
-    {
-      "stop_id": "CTU-019",
-      "name": "Aroma",
-      "coordinates": null
+    "Aroma": {
+      "name": "Aroma / Sector 22",
+      "lat": 30.7337,
+      "lng": 76.7765
     },
-    {
-      "stop_id": "CTU-020",
-      "name": "Sector-35/22",
-      "coordinates": null
+
+    "Sector-35-22": {
+      "name": "Sector 35/22",
+      "lat": 30.7198,
+      "lng": 76.7668
     },
-    {
-      "stop_id": "CTU-021",
+
+    "Kissan-Bhawan": {
       "name": "Kissan Bhawan",
-      "coordinates": null
+      "lat": 30.7137,
+      "lng": 76.7645
     },
-    {
-      "stop_id": "CTU-022",
-      "name": "35/36",
-      "coordinates": null
+
+    "Sector-35-36": {
+      "name": "Sector 35/36",
+      "lat": 30.7159,
+      "lng": 76.7589
     },
-    {
-      "stop_id": "CTU-023",
+
+    "Atawa": {
       "name": "Atawa",
-      "coordinates": null
+      "lat": 30.7126,
+      "lng": 76.7555
     },
-    {
-      "stop_id": "CTU-024",
+
+    "ISBT-43": {
       "name": "ISBT-43",
-      "coordinates": null
+      "lat": 30.7088,
+      "lng": 76.7592
     },
-    {
-      "stop_id": "CTU-025",
-      "name": "F/Chowk",
-      "coordinates": null
+
+    "Balongi": {
+      "name": "Balongi",
+      "lat": 30.6936,
+      "lng": 76.7148
     },
-    {
-      "stop_id": "CTU-026",
-      "name": "Phase-2",
-      "coordinates": null
+
+    "Daun": {
+      "name": "Daun",
+      "lat": 30.6845,
+      "lng": 76.7015
     },
-    {
-      "stop_id": "CTU-027",
-      "name": "Phase-6",
-      "coordinates": null
-    },
-    {
-      "stop_id": "CTU-028",
-      "name": "Desu Majra",
-      "coordinates": null
-    },
-    {
-      "stop_id": "CTU-029",
+
+    "Mundi-Kharar": {
       "name": "Mundi Kharar",
-      "coordinates": null
-    },
-    {
-      "stop_id": "CTU-030",
-      "name": "Kharar",
-      "coordinates": null
+      "lat": 30.7460,
+      "lng": 76.6470
     }
-  ]
+
+  }
 }
