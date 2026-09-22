@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>TransitFlow — Move Smarter</title>
+
+    <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body>
+
+<!-- ================= NAVBAR ================= -->
+
+<header class="nav">
+
+    <a href="index.html" class="brand">
+        <span class="brand-dot"></span>
+        TransitFlow
+    </a>
+
+    <nav>
+        <a href="index.html" class="active">Home</a>
+        <a href="dashboard.html">Intelligence</a>
+        <a href="routes.html">Transit Map</a>
+        <a href="forecasting.html">Forecast</a>
+    </nav>
+
+    <a href="dashboard.html" class="nav-btn">
+        Explore platform ↗
+    </a>
+
+</header>
+
+
+<!-- ================= HERO ================= -->
+
+<main>
+
+<section class="hero">
+
+    <div class="hero-copy">
+
+        <div class="eyebrow">
+            <span></span>
+            CITY TRANSIT INTELLIGENCE
+        </div>
+
+        <h1>
+            Move through the city
+            <em>smarter.</em>
+        </h1>
+
+        <p>
+            Plan journeys, understand transit demand and discover
+            what is happening across the network — all in one place.
+        </p>
+
+        <div class="hero-actions">
+
+            <a href="routes.html" class="primary">
+                Plan a journey →
+            </a>
+
+            <a href="dashboard.html" class="secondary">
+                Explore intelligence
+            </a>
+
+        </div>
+
+        <div class="trust-row">
+
+            <span>● Demo network</span>
+            <span>● Chandigarh Tricity prototype</span>
+            <span>● Data-driven</span>
+
+        </div>
+
+    </div>
+
+
+    <!-- MAP VISUAL -->
+
+    <div class="hero-map">
+
+        <div class="map-grid"></div>
+
+        <div class="route r1"></div>
+        <div class="route r2"></div>
+        <div class="route r3"></div>
+
+        <div class="stop s1">17</div>
+        <div class="stop s2">22</div>
+        <div class="stop s3">34</div>
+        <div class="stop s4">CU</div>
+
+        <div class="bus bus1">🚌</div>
+        <div class="bus bus2">🚌</div>
+
+        <div class="map-label">
+
+            <small>NETWORK STATUS</small>
+
+            <strong>
+                84 routes active
+            </strong>
+
+            <span>
+                Live-style demo data
+            </span>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= JOURNEY PLANNER ================= -->
+
+<section class="planner section">
+
+    <div class="section-head">
+
+        <div>
+
+            <div class="eyebrow">
+                01 / JOURNEY PLANNER
+            </div>
+
+            <h2>
+                Where are you going?
+            </h2>
+
+        </div>
+
+        <span class="muted">
+            Demo network
+        </span>
+
+    </div>
+
+
+    <div class="planner-card">
+
+        <div class="field">
+
+            <label>FROM</label>
+
+            <input
+                id="from"
+                type="text"
+                value="Sector 17"
+            >
+
+        </div>
+
+
+        <div class="swap">
+            ↔
+        </div>
+
+
+        <div class="field">
+
+            <label>TO</label>
+
+            <input
+                id="to"
+                type="text"
+                value="Chandigarh University"
+            >
+
+        </div>
+
+
+        <button
+            class="primary"
+            onclick="planJourney()"
+        >
+            Find routes →
+        </button>
+
+    </div>
+
+
+    <div
+        id="routeResults"
+        class="route-results hidden"
+    ></div>
+
+</section>
+
+
+<!-- ================= FEATURES ================= -->
+
+<section class="features section">
+
+    <div class="section-head">
+
+        <div>
+
+            <div class="eyebrow">
+                02 / ONE NETWORK
+            </div>
+
+            <h2>
+                Built around the way a city moves.
+            </h2>
+
+        </div>
+
+    </div>
+
+
+    <div class="feature-grid">
+
+
+        <article class="feature-card large">
+
+            <span class="feature-icon">
+                ⌖
+            </span>
+
+            <h3>
+                Transit network
+            </h3>
+
+            <p>
+                Explore routes, stops, service status
+                and network activity on an interactive map.
+            </p>
+
+            <a href="routes.html">
+                Open map →
+            </a>
+
+        </article>
+
+
+        <article class="feature-card">
+
+            <span class="feature-icon">
+                ◒
+            </span>
+
+            <h3>
+                Demand intelligence
+            </h3>
+
+            <p>
+                Understand passenger patterns,
+                peaks, routes and revenue.
+            </p>
+
+            <a href="dashboard.html">
+                View intelligence →
+            </a>
+
+        </article>
+
+
+        <article class="feature-card">
+
+            <span class="feature-icon">
+                ↗
+            </span>
+
+            <h3>
+                Forecasting
+            </h3>
+
+            <p>
+                Use historical patterns to estimate
+                future transit demand.
+            </p>
+
+            <a href="forecasting.html">
+                See forecast →
+            </a>
+
+        </article>
+
+    </div>
+
+</section>
+
+
+<!-- ================= STATISTICS ================= -->
+
+<section class="stats section">
+
+    <div class="stat">
+
+        <strong data-count="1240000">
+            0
+        </strong>
+
+        <span>
+            Passenger journeys
+        </span>
+
+    </div>
+
+
+    <div class="stat">
+
+        <strong data-count="84">
+            0
+        </strong>
+
+        <span>
+            Routes in network
+        </span>
+
+    </div>
+
+
+    <div class="stat">
+
+        <strong data-count="312">
+            0
+        </strong>
+
+        <span>
+            Active vehicles
+        </span>
+
+    </div>
+
+
+    <div class="stat">
+
+        <strong data-count="17">
+            0
+        </strong>
+
+        <span>
+            Service alerts
+        </span>
+
+    </div>
+
+</section>
+
+
+<!-- ================= CTA ================= -->
+
+<section class="cta section">
+
+    <div>
+
+        <div class="eyebrow">
+            03 / TRANSIT INTELLIGENCE
+        </div>
+
+        <h2>
+            See the network beyond the map.
+        </h2>
+
+        <p>
+            From passenger demand to predicted ridership,
+            TransitFlow turns transit data into decisions.
+        </p>
+
+    </div>
+
+
+    <a href="dashboard.html" class="primary">
+        Open operations view →
+    </a>
+
+</section>
+
+</main>
+
+
+<!-- ================= FOOTER ================= -->
+
+<footer>
+
+    <span>
+        TransitFlow
+    </span>
+
+    <span>
+        Chandigarh Tricity prototype · Demo data
+    </span>
+
+</footer>
+
+
+<script src="js/main.js"></script>
+
+</body>
+</html>
