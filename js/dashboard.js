@@ -1,446 +1,285 @@
-/* ==========================================
-   TRANSITFLOW INTELLIGENCE
-========================================== */
+// ==========================================
+// TRANSITFLOW DASHBOARD
+// ==========================================
 
 
-/* ==========================================
-   RIDERSHIP LINE CHART
-========================================== */
-
+// RIDERSHIP CHART
 const ridershipCanvas =
-    document.getElementById(
-        "ridershipChart"
-    );
+    document.getElementById("ridershipChart");
 
+if (ridershipCanvas) {
 
-const ridershipChart =
-    new Chart(
-        ridershipCanvas,
-        {
+    new Chart(ridershipCanvas, {
 
-            type: "line",
+        type: "line",
 
+        data: {
 
-            data: {
+            labels: [
+                "Mon",
+                "Tue",
+                "Wed",
+                "Thu",
+                "Fri",
+                "Sat",
+                "Sun"
+            ],
 
-                labels: [
+            datasets: [
 
-                    "Mon",
-                    "Tue",
-                    "Wed",
-                    "Thu",
-                    "Fri",
-                    "Sat",
-                    "Sun"
+                {
+                    label: "Passenger journeys",
 
-                ],
+                    data: [
+                        154,
+                        168,
+                        162,
+                        181,
+                        193,
+                        139,
+                        126
+                    ],
 
+                    borderWidth: 3,
 
-                datasets: [
+                    tension: 0.4,
 
-                    {
+                    fill: true,
 
-                        label:
-                            "Passenger journeys",
+                    pointRadius: 4,
 
-                        data: [
-
-                            154,
-                            168,
-                            162,
-                            181,
-                            193,
-                            139,
-                            126
-
-                        ],
-
-                        borderWidth: 2,
-
-                        tension: 0.35,
-
-                        fill: false
-
-                    }
-
-                ]
-
-            },
-
-
-            options: {
-
-                responsive: true,
-
-                maintainAspectRatio: true,
-
-
-                plugins: {
-
-                    legend: {
-
-                        labels: {
-
-                            color:
-                                "#a7afc0"
-
-                        }
-
-                    }
-
-                },
-
-
-                scales: {
-
-                    x: {
-
-                        ticks: {
-
-                            color:
-                                "#737c91"
-
-                        },
-
-
-                        grid: {
-
-                            color:
-                                "rgba(255,255,255,.04)"
-
-                        }
-
-                    },
-
-
-                    y: {
-
-                        ticks: {
-
-                            color:
-                                "#737c91"
-
-                        },
-
-
-                        grid: {
-
-                            color:
-                                "rgba(255,255,255,.04)"
-
-                        }
-
-                    }
-
+                    pointHoverRadius: 7
                 }
 
+            ]
+        },
+
+        options: {
+
+            responsive: true,
+
+            maintainAspectRatio: false,
+
+            plugins: {
+
+                legend: {
+                    display: false
+                }
+            },
+
+            scales: {
+
+                y: {
+
+                    beginAtZero: false,
+
+                    grid: {
+                        color: "rgba(255,255,255,0.06)"
+                    },
+
+                    ticks: {
+                        color: "#87958e"
+                    }
+                },
+
+                x: {
+
+                    grid: {
+                        display: false
+                    },
+
+                    ticks: {
+                        color: "#87958e"
+                    }
+                }
             }
-
         }
-    );
+    });
+}
 
 
-
-/* ==========================================
-   PEAK HOURS BAR CHART
-========================================== */
+// ==========================================
+// PEAK HOURS CHART
+// ==========================================
 
 const peakCanvas =
-    document.getElementById(
-        "peakChart"
-    );
+    document.getElementById("peakChart");
 
+if (peakCanvas) {
 
-const peakChart =
-    new Chart(
-        peakCanvas,
-        {
+    new Chart(peakCanvas, {
 
-            type: "bar",
+        type: "bar",
 
+        data: {
 
-            data: {
+            labels: [
+                "6 AM",
+                "8 AM",
+                "10 AM",
+                "12 PM",
+                "2 PM",
+                "4 PM",
+                "6 PM",
+                "8 PM"
+            ],
 
-                labels: [
+            datasets: [
 
-                    "6 AM",
-                    "8 AM",
-                    "10 AM",
-                    "12 PM",
-                    "2 PM",
-                    "4 PM",
-                    "6 PM",
-                    "8 PM"
+                {
+                    label: "Demand",
 
-                ],
+                    data: [
+                        42,
+                        91,
+                        73,
+                        58,
+                        52,
+                        67,
+                        88,
+                        49
+                    ],
 
+                    borderRadius: 6,
 
-                datasets: [
-
-                    {
-
-                        label:
-                            "Demand",
-
-                        data: [
-
-                            42,
-                            91,
-                            73,
-                            58,
-                            52,
-                            67,
-                            88,
-                            49
-
-                        ],
-
-                        borderWidth: 0
-
-                    }
-
-                ]
-
-            },
-
-
-            options: {
-
-                responsive: true,
-
-
-                plugins: {
-
-                    legend: {
-
-                        display: false
-
-                    }
-
-                },
-
-
-                scales: {
-
-                    x: {
-
-                        ticks: {
-
-                            color:
-                                "#737c91"
-
-                        },
-
-                        grid: {
-
-                            display: false
-
-                        }
-
-                    },
-
-
-                    y: {
-
-                        ticks: {
-
-                            color:
-                                "#737c91"
-
-                        },
-
-                        grid: {
-
-                            color:
-                                "rgba(255,255,255,.04)"
-
-                        }
-
-                    }
-
+                    borderWidth: 0
                 }
 
+            ]
+        },
+
+        options: {
+
+            responsive: true,
+
+            maintainAspectRatio: false,
+
+            plugins: {
+
+                legend: {
+                    display: false
+                }
+            },
+
+            scales: {
+
+                y: {
+
+                    beginAtZero: true,
+
+                    grid: {
+                        color: "rgba(255,255,255,0.06)"
+                    },
+
+                    ticks: {
+                        color: "#87958e"
+                    }
+                },
+
+                x: {
+
+                    grid: {
+                        display: false
+                    },
+
+                    ticks: {
+                        color: "#87958e"
+                    }
+                }
             }
-
         }
-    );
+    });
+}
 
 
+// ==========================================
+// ASK TRANSITFLOW
+// ==========================================
 
-/* ==========================================
-   ASK TRANSITFLOW
-========================================== */
-
-function askFlow() {
-
+function askTransitFlow() {
 
     const input =
-        document.getElementById(
-            "question"
-        );
-
+        document.getElementById("aiQuestion");
 
     const answer =
-        document.getElementById(
-            "answer"
-        );
-
+        document.getElementById("aiAnswer");
 
     const question =
-        input.value
-            .toLowerCase()
-            .trim();
-
+        input.value.toLowerCase().trim();
 
 
     if (!question) {
 
         answer.innerHTML = `
-
-            <span>
-                ✦
-            </span>
-
-            <div>
-                Ask me something about
-                the transit network.
-            </div>
-
+            <span>AI</span>
+            <p>
+                Please enter a question first.
+            </p>
         `;
 
         return;
     }
 
 
+    let response = "";
 
-    let response = `
-
-        TransitFlow found that
-        Route 204 currently records
-        the highest passenger volume
-        in the demo dataset.
-
-        Demand is concentrated around
-        the morning and evening commute
-        windows.
-
-    `;
-
-
-
-    /* ==========================
-       REVENUE QUESTION
-    ========================== */
 
     if (
         question.includes("revenue") ||
-        question.includes("money") ||
-        question.includes("income")
+        question.includes("earning") ||
+        question.includes("money")
     ) {
 
-        response = `
-
-            The current demo network
-            estimates ₹8.6M in revenue
-            for the selected period.
-
-            The production version can
-            calculate this directly from
-            the connected transit dataset.
-
-        `;
+        response =
+            "Estimated network revenue for the current demonstration period is ₹8.6M.";
 
     }
 
-
-
-    /* ==========================
-       PEAK QUESTION
-    ========================== */
-
     else if (
-
         question.includes("peak") ||
-        question.includes("time") ||
-        question.includes("busy")
-
+        question.includes("busy") ||
+        question.includes("highest") ||
+        question.includes("demand")
     ) {
 
-        response = `
-
-            The strongest demand window
-            in the current demo data is
-            08:00–10:00.
-
-            A second high-demand period
-            appears around 18:00.
-
-        `;
+        response =
+            "Demand is strongest around 08:00–10:00, with another significant peak around 18:00.";
 
     }
 
-
-
-    /* ==========================
-       ROUTE QUESTION
-    ========================== */
-
     else if (
-
         question.includes("route") ||
         question.includes("bus")
-
     ) {
 
-        response = `
-
-            Route 204 currently leads the
-            demo network with approximately
-            18,421 passenger journeys.
-
-            Route 116 follows with around
-            16,205 journeys.
-
-        `;
+        response =
+            "Route 204 currently records the highest demonstration ridership at 18,421 passenger journeys, followed by Route 116 at 16,205.";
 
     }
-
-
-
-    /* ==========================
-       PASSENGER QUESTION
-    ========================== */
 
     else if (
-
         question.includes("passenger") ||
         question.includes("ridership")
-
     ) {
 
-        response = `
-
-            The network currently contains
-            approximately 1.24M passenger
-            journeys in the displayed
-            demonstration period.
-
-        `;
+        response =
+            "The demonstration network contains approximately 1.24M passenger journeys for the displayed period.";
 
     }
 
+    else {
+
+        response =
+            "Based on the displayed demonstration data, Route 204 has the highest ridership and morning demand is strongest between 08:00 and 10:00.";
+
+    }
 
 
     answer.innerHTML = `
+        <span>AI</span>
 
-        <span>
-            ✦
-        </span>
-
-        <div>
+        <p>
             ${response}
-        </div>
-
+        </p>
     `;
-
 }
