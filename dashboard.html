@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        TransitFlow — Intelligence
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="css/main.css"
+    >
+
+    <!-- Chart.js -->
+    <script
+        src="https://cdn.jsdelivr.net/npm/chart.js"
+    ></script>
+
+</head>
+
+
+<body>
+
+
+<!-- ================= NAVBAR ================= -->
+
+<header class="nav">
+
+    <a
+        href="index.html"
+        class="brand"
+    >
+
+        <span class="brand-dot"></span>
+
+        TransitFlow
+
+    </a>
+
+
+    <nav>
+
+        <a href="index.html">
+            Home
+        </a>
+
+        <a
+            href="dashboard.html"
+            class="active"
+        >
+            Intelligence
+        </a>
+
+        <a href="routes.html">
+            Transit Map
+        </a>
+
+        <a href="forecasting.html">
+            Forecast
+        </a>
+
+    </nav>
+
+
+    <a
+        href="routes.html"
+        class="nav-btn"
+    >
+        Plan journey ↗
+    </a>
+
+</header>
+
+
+
+<!-- ================= MAIN ================= -->
+
+<main class="dashboard section">
+
+
+    <!-- PAGE HEADER -->
+
+    <div class="page-title">
+
+        <div>
+
+            <div class="eyebrow">
+
+                OPERATIONS /
+                NETWORK INTELLIGENCE
+
+            </div>
+
+
+            <h1>
+
+                What is happening
+                across the network?
+
+            </h1>
+
+
+            <p>
+
+                Understand passenger demand,
+                route performance and network activity.
+
+            </p>
+
+        </div>
+
+
+        <span class="status">
+
+            ● NETWORK ONLINE
+
+        </span>
+
+    </div>
+
+
+
+    <!-- ================= KPI CARDS ================= -->
+
+    <div class="kpi-grid">
+
+
+        <!-- PASSENGERS -->
+
+        <div class="kpi">
+
+            <span>
+                PASSENGER JOURNEYS
+            </span>
+
+
+            <strong>
+                1.24M
+            </strong>
+
+
+            <small>
+                +8.4% vs previous period
+            </small>
+
+        </div>
+
+
+
+        <!-- REVENUE -->
+
+        <div class="kpi">
+
+            <span>
+                EST. REVENUE
+            </span>
+
+
+            <strong>
+                ₹8.6M
+            </strong>
+
+
+            <small>
+                +5.2% vs previous period
+            </small>
+
+        </div>
+
+
+
+        <!-- UTILIZATION -->
+
+        <div class="kpi">
+
+            <span>
+                PEAK UTILIZATION
+            </span>
+
+
+            <strong>
+                68%
+            </strong>
+
+
+            <small>
+                08:00 — 10:00
+            </small>
+
+        </div>
+
+
+
+        <!-- ALERTS -->
+
+        <div class="kpi">
+
+            <span>
+                ACTIVE ALERTS
+            </span>
+
+
+            <strong>
+                17
+            </strong>
+
+
+            <small>
+                4 require attention
+            </small>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ================= DASHBOARD GRID ================= -->
+
+    <div class="dashboard-grid">
+
+
+        <!-- ========================================
+             RIDERSHIP CHART
+        ========================================= -->
+
+        <article class="panel wide">
+
+
+            <div class="panel-head">
+
+                <div>
+
+                    <div class="eyebrow">
+                        RIDERSHIP
+                    </div>
+
+
+                    <h3>
+                        Passenger demand
+                    </h3>
+
+                </div>
+
+
+                <select id="period">
+
+                    <option>
+                        Last 7 days
+                    </option>
+
+                    <option>
+                        Last 30 days
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <canvas
+                id="ridershipChart"
+            ></canvas>
+
+
+        </article>
+
+
+
+        <!-- ========================================
+             TOP ROUTES
+        ========================================= -->
+
+        <article class="panel">
+
+
+            <div class="panel-head">
+
+                <div>
+
+                    <div class="eyebrow">
+                        ROUTES
+                    </div>
+
+
+                    <h3>
+                        Top performing
+                    </h3>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="rank">
+
+                <b>
+                    204
+                </b>
+
+                <span>
+                    18,421 passengers
+                </span>
+
+                <strong>
+                    ↑ 18%
+                </strong>
+
+            </div>
+
+
+
+            <div class="rank">
+
+                <b>
+                    116
+                </b>
+
+                <span>
+                    16,205 passengers
+                </span>
+
+                <strong>
+                    ↑ 11%
+                </strong>
+
+            </div>
+
+
+
+            <div class="rank">
+
+                <b>
+                    23
+                </b>
+
+                <span>
+                    14,903 passengers
+                </span>
+
+                <strong>
+                    ↑ 8%
+                </strong>
+
+            </div>
+
+
+
+            <div class="rank">
+
+                <b>
+                    45
+                </b>
+
+                <span>
+                    12,810 passengers
+                </span>
+
+                <strong>
+                    ↑ 6%
+                </strong>
+
+            </div>
+
+
+        </article>
+
+
+
+        <!-- ========================================
+             PEAK HOURS
+        ========================================= -->
+
+        <article class="panel">
+
+
+            <div class="panel-head">
+
+                <div>
+
+                    <div class="eyebrow">
+                        DEMAND
+                    </div>
+
+
+                    <h3>
+                        Peak hours
+                    </h3>
+
+                </div>
+
+            </div>
+
+
+            <canvas
+                id="peakChart"
+            ></canvas>
+
+
+        </article>
+
+
+
+        <!-- ========================================
+             AI ASSISTANT
+        ========================================= -->
+
+        <article class="panel wide">
+
+
+            <div class="panel-head">
+
+                <div>
+
+                    <div class="eyebrow">
+                        AI INSIGHTS
+                    </div>
+
+
+                    <h3>
+                        Ask TransitFlow
+                    </h3>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="ask">
+
+
+                <input
+                    id="question"
+                    type="text"
+                    placeholder="Ask about routes, demand, peaks or revenue..."
+                >
+
+
+                <button
+                    class="primary"
+                    onclick="askFlow()"
+                >
+                    Ask →
+                </button>
+
+
+            </div>
+
+
+
+            <div
+                id="answer"
+                class="answer"
+            >
+
+                <span>
+                    ✦
+                </span>
+
+
+                <div>
+
+                    Ask TransitFlow something about
+                    the transit network.
+
+                </div>
+
+            </div>
+
+
+        </article>
+
+
+    </div>
+
+
+</main>
+
+
+
+<!-- ================= FOOTER ================= -->
+
+<footer>
+
+    <span>
+        TransitFlow Intelligence
+    </span>
+
+    <span>
+        Demo analytics · Not live operational data
+    </span>
+
+</footer>
+
+
+
+<script
+    src="js/dashboard.js"
+></script>
+
+
+</body>
+
+</html>
