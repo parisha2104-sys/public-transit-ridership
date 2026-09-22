@@ -1,304 +1,649 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>TransitFlow — CTU Routes</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
+    <title>TransitFlow — Transit Map</title>
+
+    <!-- MAIN CSS -->
+    <link rel="stylesheet" href="css/main.css">
+
+    <!-- LEAFLET CSS -->
     <link
         rel="stylesheet"
         href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     >
 
-    <link rel="stylesheet" href="main.css">
-
     <style>
+
+        /* ================================
+           ROUTES PAGE
+        ================================= */
+
         body {
             margin: 0;
             background: #07100d;
             color: #f5f7f6;
-            font-family: Arial, sans-serif;
         }
+
 
         .routes-page {
+
             display: grid;
-            grid-template-columns: 340px 1fr;
+
+            grid-template-columns: 380px 1fr;
+
             height: calc(100vh - 72px);
+
         }
+
+
+        /* ================================
+           SIDEBAR
+        ================================= */
 
         .route-sidebar {
-            background: #0b1512;
-            border-right: 1px solid rgba(255,255,255,0.08);
-            padding: 24px;
+
+            background: #08120f;
+
+            border-right:
+                1px solid rgba(255,255,255,0.08);
+
+            padding: 28px;
+
             overflow-y: auto;
+
         }
+
 
         .route-sidebar h2 {
-            margin-top: 0;
-            font-size: 24px;
+
+            margin: 0 0 12px;
+
+            font-size: 30px;
+
         }
 
-        .route-sidebar p {
-            color: #91a09a;
+
+        .route-sidebar > p {
+
+            color: #8d9c95;
+
+            line-height: 1.6;
+
             font-size: 14px;
-            line-height: 1.5;
+
+            margin-bottom: 18px;
+
         }
+
+
+        /* ================================
+           SOURCE BADGE
+        ================================= */
 
         .source-badge {
+
             display: inline-block;
-            margin: 12px 0 20px;
-            padding: 7px 10px;
-            border-radius: 20px;
-            background: rgba(169,255,92,0.10);
+
+            padding: 8px 12px;
+
+            margin-bottom: 24px;
+
+            border-radius: 30px;
+
+            background:
+                rgba(169,255,92,0.10);
+
             color: #a9ff5c;
+
             font-size: 12px;
+
+            font-weight: 600;
+
         }
+
+
+        /* ================================
+           ROUTE CARDS
+        ================================= */
 
         .route-card {
-            padding: 17px;
-            margin-bottom: 12px;
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 14px;
-            background: #101c18;
+
+            padding: 20px;
+
+            margin-bottom: 14px;
+
+            background: #0d1b16;
+
+            border:
+                1px solid rgba(255,255,255,0.08);
+
+            border-radius: 16px;
+
             cursor: pointer;
-            transition: 0.2s;
+
+            transition:
+                transform 0.2s ease,
+                border-color 0.2s ease,
+                background 0.2s ease;
+
         }
 
-        .route-card:hover,
-        .route-card.active {
-            border-color: #a9ff5c;
+
+        .route-card:hover {
+
             transform: translateY(-2px);
+
+            border-color:
+                rgba(169,255,92,0.45);
+
         }
+
+
+        .route-card.active {
+
+            border-color: #a9ff5c;
+
+            background: #101f18;
+
+        }
+
 
         .route-number {
-            font-size: 22px;
-            font-weight: bold;
+
+            font-size: 27px;
+
+            font-weight: 700;
+
             color: #a9ff5c;
+
+            margin-bottom: 6px;
+
         }
+
 
         .route-name {
-            margin-top: 6px;
-            font-size: 14px;
+
+            font-size: 15px;
+
+            color: #ffffff;
+
         }
+
+
+        /* ================================
+           ROUTE META
+        ================================= */
 
         .route-meta {
+
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-top: 14px;
+
+            grid-template-columns:
+                1fr 1fr;
+
+            gap: 10px;
+
+            margin-top: 18px;
+
         }
+
 
         .meta-box {
-            background: #07100d;
-            padding: 9px;
-            border-radius: 8px;
+
+            background: #050c09;
+
+            padding: 11px;
+
+            border-radius: 9px;
+
         }
+
 
         .meta-label {
+
             display: block;
-            color: #73817b;
+
+            color: #66766e;
+
             font-size: 10px;
+
             text-transform: uppercase;
+
+            letter-spacing: 0.5px;
+
         }
+
 
         .meta-value {
+
             display: block;
-            margin-top: 3px;
-            font-size: 13px;
+
+            margin-top: 5px;
+
+            color: #ffffff;
+
+            font-size: 14px;
+
         }
+
+
+        /* ================================
+           MAP
+        ================================= */
+
+        .map-container {
+
+            position: relative;
+
+            width: 100%;
+
+            height: 100%;
+
+        }
+
 
         #map {
+
             width: 100%;
+
             height: 100%;
-            background: #111;
+
         }
+
+
+        /* ================================
+           ROUTE DETAILS CARD
+        ================================= */
 
         .route-details {
+
             position: absolute;
+
             z-index: 1000;
-            right: 25px;
-            bottom: 25px;
-            width: 330px;
-            padding: 20px;
-            background: rgba(8,17,14,0.94);
-            border: 1px solid rgba(255,255,255,0.10);
-            border-radius: 16px;
-            backdrop-filter: blur(12px);
+
+            right: 24px;
+
+            bottom: 24px;
+
+            width: 340px;
+
+            padding: 22px;
+
+            background:
+                rgba(7,16,13,0.95);
+
+            border:
+                1px solid rgba(255,255,255,0.10);
+
+            border-radius: 18px;
+
+            backdrop-filter: blur(14px);
+
+            box-shadow:
+                0 20px 50px
+                rgba(0,0,0,0.35);
+
         }
+
 
         .route-details h3 {
-            margin: 0 0 8px;
+
+            margin: 0 0 10px;
+
             color: #a9ff5c;
+
+            font-size: 22px;
+
         }
+
 
         .route-details p {
-            margin: 7px 0;
-            color: #b7c1bc;
+
+            color: #b4c0ba;
+
             font-size: 13px;
+
+            line-height: 1.5;
+
+            margin: 7px 0;
+
         }
+
+
+        /* ================================
+           STOP LIST
+        ================================= */
 
         .stop-list {
-            margin-top: 14px;
-            max-height: 180px;
+
+            margin-top: 16px;
+
+            max-height: 190px;
+
             overflow-y: auto;
+
         }
+
+
+        .stop-title {
+
+            color: #ffffff;
+
+            font-size: 12px;
+
+            font-weight: 600;
+
+            margin-bottom: 8px;
+
+        }
+
 
         .stop {
-            padding: 7px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+
+            padding: 8px 0;
+
+            border-bottom:
+                1px solid rgba(255,255,255,0.05);
+
+            color: #d5ddd9;
+
             font-size: 12px;
-            color: #dce4df;
+
         }
 
+
         .stop::before {
+
             content: "●";
+
             color: #a9ff5c;
+
             margin-right: 8px;
+
         }
+
+
+        /* ================================
+           LEAFLET
+        ================================= */
 
         .leaflet-popup-content-wrapper,
         .leaflet-popup-tip {
+
             background: #101c18;
-            color: white;
+
+            color: #ffffff;
+
         }
+
+
+        .leaflet-popup-content {
+
+            font-size: 13px;
+
+        }
+
 
         .leaflet-control-attribution {
-            background: rgba(0,0,0,0.7) !important;
+
+            background:
+                rgba(0,0,0,0.70) !important;
+
             color: #aaa;
+
         }
 
-        @media (max-width: 850px) {
+
+        /* ================================
+           MOBILE
+        ================================= */
+
+        @media (max-width: 900px) {
+
             .routes-page {
+
                 grid-template-columns: 1fr;
-                grid-template-rows: 380px 1fr;
+
+                grid-template-rows:
+                    420px 1fr;
+
+                height: auto;
+
+                min-height:
+                    calc(100vh - 72px);
+
             }
+
+
+            .map-container {
+
+                order: 1;
+
+                height: 420px;
+
+            }
+
 
             .route-sidebar {
+
                 order: 2;
+
             }
 
-            #map {
-                order: 1;
-            }
 
             .route-details {
+
                 display: none;
+
             }
+
         }
+
     </style>
+
 </head>
+
 
 <body>
 
-    <!-- NAVBAR -->
+
+    <!-- ==================================
+         NAVBAR
+    =================================== -->
+
     <nav class="navbar">
-        <div class="logo">TransitFlow</div>
+
+        <div class="logo">
+            TransitFlow
+        </div>
+
 
         <div class="nav-links">
-            <a href="index.html">Home</a>
-            <a href="dashboard.html">Intelligence</a>
-            <a href="routes.html">Transit Map</a>
-            <a href="forecasting.html">Forecast</a>
-            <a href="index.html#planner">Plan Journey</a>
+
+            <a href="index.html">
+                Home
+            </a>
+
+            <a href="dashboard.html">
+                Intelligence
+            </a>
+
+            <a href="routes.html">
+                Transit Map
+            </a>
+
+            <a href="forecasting.html">
+                Forecast
+            </a>
+
+            <a href="index.html#planner">
+                Plan Journey
+            </a>
+
         </div>
+
     </nav>
 
 
-    <!-- ROUTES + MAP -->
+
+    <!-- ==================================
+         MAIN ROUTES AREA
+    =================================== -->
+
     <main class="routes-page">
 
-        <!-- SIDEBAR -->
+
+        <!-- ==================================
+             SIDEBAR
+        =================================== -->
+
         <aside class="route-sidebar">
 
-            <h2>CTU Network</h2>
+            <h2>
+                CTU Network
+            </h2>
+
 
             <p>
-                Chandigarh Transport Undertaking routes
-                based on published CTU timetable information.
+
+                Chandigarh Transport Undertaking
+                routes based on published CTU
+                timetable information.
+
             </p>
 
+
             <span class="source-badge">
+
                 ● OFFICIAL CTU DATA
+
             </span>
 
+
             <div id="routeList">
-                Loading routes...
+
+                Loading CTU routes...
+
             </div>
 
         </aside>
 
 
-        <!-- MAP -->
-        <section style="position:relative;">
+
+        <!-- ==================================
+             MAP
+        =================================== -->
+
+        <section class="map-container">
+
 
             <div id="map"></div>
 
-            <div class="route-details" id="routeDetails">
-                <h3>Select a route</h3>
+
+            <!-- ROUTE DETAILS -->
+
+            <div
+                class="route-details"
+                id="routeDetails"
+            >
+
+                <h3>
+                    Select a route
+                </h3>
+
+
                 <p>
-                    Choose a CTU route from the left panel
-                    to view its published route information.
+
+                    Choose a CTU route from the
+                    left panel to view its published
+                    route information.
+
                 </p>
+
             </div>
+
 
         </section>
 
     </main>
 
 
-    <!-- LEAFLET -->
+
+    <!-- ==================================
+         LEAFLET JS
+    =================================== -->
+
     <script
         src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
     </script>
 
 
+
     <script>
 
-        let map;
-        let routeData = [];
-        let activeRoute = null;
+        // =========================================
+        // MAP INITIALIZATION
+        // =========================================
 
-        let routeLayer = null;
-
-
-        /*
-        --------------------------------------------------
-        INITIALIZE MAP
-        --------------------------------------------------
-        */
-
-        map = L.map("map").setView(
+        const map = L.map("map").setView(
             [30.7333, 76.7794],
             12
         );
 
 
+        // OpenStreetMap
+
         L.tileLayer(
             "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
             {
                 maxZoom: 19,
-                attribution: '&copy; OpenStreetMap contributors'
+
+                attribution:
+                    "&copy; OpenStreetMap contributors"
             }
         ).addTo(map);
 
 
-        /*
-        --------------------------------------------------
-        LOAD REAL CTU JSON
-        --------------------------------------------------
-        */
+
+        // =========================================
+        // VARIABLES
+        // =========================================
+
+        let routeData = [];
+
+        let activeLayer = null;
+
+
+
+        // =========================================
+        // LOAD ROUTES.JSON
+        // =========================================
 
         fetch("data/routes.json")
 
             .then(response => {
 
                 if (!response.ok) {
-                    throw new Error("routes.json not found");
+
+                    throw new Error(
+                        "Unable to find data/routes.json"
+                    );
+
                 }
 
                 return response.json();
+
             })
+
 
             .then(data => {
 
@@ -308,105 +653,157 @@
 
             })
 
+
             .catch(error => {
 
                 console.error(error);
 
-                document.getElementById("routeList").innerHTML = `
+                document.getElementById(
+                    "routeList"
+                ).innerHTML = `
+
                     <div style="
-                        color:#ff7b7b;
-                        padding:15px;
-                        background:#1c1111;
-                        border-radius:10px;
+                        padding:16px;
+                        background:#211010;
+                        border-radius:12px;
+                        color:#ff7777;
+                        line-height:1.5;
                     ">
-                        Unable to load CTU route data.
+
+                        <strong>
+                            Unable to load CTU route data.
+                        </strong>
+
                         <br><br>
-                        Check that:
-                        <br>
-                        <b>data/routes.json</b>
-                        <br>
-                        exists in your GitHub repository.
+
+                        Make sure this file exists:
+
+                        <br><br>
+
+                        <b>
+                            data/routes.json
+                        </b>
+
                     </div>
+
                 `;
 
             });
 
 
-        /*
-        --------------------------------------------------
-        CREATE ROUTE CARDS
-        --------------------------------------------------
-        */
+
+        // =========================================
+        // CREATE ROUTE CARDS
+        // =========================================
 
         function renderRoutes(routes) {
 
             const container =
-                document.getElementById("routeList");
+                document.getElementById(
+                    "routeList"
+                );
+
 
             container.innerHTML = "";
 
-            routes.forEach((route, index) => {
+
+            routes.forEach(route => {
 
                 const card =
                     document.createElement("div");
 
-                card.className = "route-card";
+
+                card.className =
+                    "route-card";
+
 
                 card.innerHTML = `
 
                     <div class="route-number">
+
                         ${route.route_id}
+
                     </div>
 
+
                     <div class="route-name">
+
                         ${route.origin}
+
                         →
+
                         ${route.destination}
+
                     </div>
+
 
                     <div class="route-meta">
 
+
                         <div class="meta-box">
+
                             <span class="meta-label">
                                 Frequency
                             </span>
 
                             <span class="meta-value">
-                                ${route.frequency_minutes} min
+
+                                ${route.frequency_minutes}
+                                min
+
                             </span>
+
                         </div>
 
+
                         <div class="meta-box">
+
                             <span class="meta-label">
                                 Distance
                             </span>
 
                             <span class="meta-value">
-                                ${route.distance_km} km
+
+                                ${route.distance_km}
+                                km
+
                             </span>
+
                         </div>
 
+
                         <div class="meta-box">
+
                             <span class="meta-label">
                                 Buses
                             </span>
 
                             <span class="meta-value">
+
                                 ${route.buses}
+
                             </span>
+
                         </div>
 
+
                         <div class="meta-box">
+
                             <span class="meta-label">
                                 Operator
                             </span>
 
                             <span class="meta-value">
+
                                 ${route.operator}
+
                             </span>
+
                         </div>
 
+
                     </div>
+
                 `;
 
 
@@ -423,21 +820,24 @@
         }
 
 
-        /*
-        --------------------------------------------------
-        SELECT ROUTE
-        --------------------------------------------------
-        */
+
+        // =========================================
+        // SELECT ROUTE
+        // =========================================
 
         function selectRoute(route, card) {
 
-            activeRoute = route;
 
             document
                 .querySelectorAll(".route-card")
-                .forEach(el =>
-                    el.classList.remove("active")
-                );
+                .forEach(element => {
+
+                    element.classList.remove(
+                        "active"
+                    );
+
+                });
+
 
             card.classList.add("active");
 
@@ -447,78 +847,134 @@
         }
 
 
-        /*
-        --------------------------------------------------
-        ROUTE DETAILS
-        --------------------------------------------------
-        */
+
+        // =========================================
+        // ROUTE DETAILS
+        // =========================================
 
         function showRouteDetails(route) {
 
             const details =
-                document.getElementById("routeDetails");
+                document.getElementById(
+                    "routeDetails"
+                );
+
 
             details.innerHTML = `
 
-                <h3>Route ${route.route_id}</h3>
+                <h3>
+
+                    Route ${route.route_id}
+
+                </h3>
+
 
                 <p>
-                    <strong>${route.origin}</strong>
+
+                    <strong>
+                        ${route.origin}
+                    </strong>
+
                     →
-                    <strong>${route.destination}</strong>
+
+                    <strong>
+                        ${route.destination}
+                    </strong>
+
                 </p>
 
+
                 <p>
+
                     Frequency:
+
                     <strong>
-                        ${route.frequency_minutes} minutes
+                        ${route.frequency_minutes}
+                        minutes
                     </strong>
+
                 </p>
 
+
                 <p>
+
                     Distance:
+
                     <strong>
-                        ${route.distance_km} km
+                        ${route.distance_km}
+                        km
                     </strong>
+
                 </p>
 
+
                 <p>
+
                     Fleet assigned:
+
                     <strong>
-                        ${route.buses} buses
+                        ${route.buses}
+                        buses
                     </strong>
+
                 </p>
 
+
                 <p>
+
                     Operator:
+
                     <strong>
                         ${route.operator}
                     </strong>
+
                 </p>
+
 
                 <div class="stop-list">
 
-                    <strong style="
-                        display:block;
-                        margin-bottom:8px;
-                    ">
+                    <div class="stop-title">
+
                         Published route sequence
-                    </strong>
+
+                    </div>
+
 
                     ${route.stops.map(
-                        stop => `
+                        (stop, index) => `
+
                             <div class="stop">
+
+                                ${index + 1}.
                                 ${stop}
+
                             </div>
+
                         `
                     ).join("")}
 
                 </div>
+
             `;
+
+
+            // =====================================
+            // TEMPORARY MAP VIEW
+            // =====================================
+
+            // We intentionally DO NOT draw fake
+            // route coordinates here.
+            //
+            // Once verified OSM coordinates are
+            // added to stops.json, this section
+            // will draw the actual route geometry.
 
         }
 
+
     </script>
 
+
 </body>
+
 </html>
