@@ -2,11 +2,9 @@
   "source": {
     "operator": "Chandigarh Transport Undertaking",
     "data_type": "Published route information",
-    "verified_against": "CTU Local Timetable dated 24.03.2025"
+    "note": "Stop coordinates are provisional map coordinates for the TransitFlow interface."
   },
-
   "stops": {
-
     "ISBT-17": {
       "name": "ISBT-17",
       "lat": 30.7412,
@@ -66,6 +64,5 @@
       "lat": 30.7460,
       "lng": 76.6470
     }
-
   }
 }
