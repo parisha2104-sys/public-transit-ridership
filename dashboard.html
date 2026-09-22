@@ -4,922 +4,235 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Transit Intelligence — TransitFlow</title>
+    <title>TransitFlow — Intelligence</title>
 
-    <!-- Root-level CSS -->
-    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="css/main.css">
 
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <style>
-
-        /* =========================================
-           TRANSIT INTELLIGENCE DASHBOARD
-           ========================================= */
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: #07090d;
-            color: #f5f7fa;
-            font-family: Inter, Arial, sans-serif;
-            overflow-x: hidden;
-        }
-
-        a {
-            text-decoration: none;
-            color: inherit;
-        }
-
-        /* ---------- NAV ---------- */
-
-        .topbar {
-            height: 76px;
-            padding: 0 5%;
-
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-
-            border-bottom: 1px solid rgba(255,255,255,0.07);
-
-            background: rgba(7,9,13,0.88);
-            backdrop-filter: blur(18px);
-
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-
-            font-size: 20px;
-            font-weight: 800;
-        }
-
-        .logo-dot {
-            width: 11px;
-            height: 11px;
-            border-radius: 50%;
-
-            background: #c7ff55;
-            box-shadow: 0 0 18px rgba(199,255,85,0.8);
-        }
-
-        .nav {
-            display: flex;
-            gap: 28px;
-            align-items: center;
-        }
-
-        .nav a {
-            color: #858d9b;
-            font-size: 13px;
-            transition: 0.2s;
-        }
-
-        .nav a:hover,
-        .nav a.active {
-            color: white;
-        }
-
-        .back-btn {
-            padding: 10px 15px;
-            border-radius: 9px;
-
-            background: rgba(199,255,85,0.09);
-            border: 1px solid rgba(199,255,85,0.18);
-
-            color: #c7ff55 !important;
-        }
-
-        /* ---------- MAIN ---------- */
-
-        .dashboard {
-            width: 90%;
-            max-width: 1450px;
-            margin: auto;
-            padding: 55px 0 100px;
-        }
-
-        .heading-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            margin-bottom: 35px;
-            gap: 30px;
-        }
-
-        .eyebrow {
-            color: #c7ff55;
-            font-size: 11px;
-            letter-spacing: 1.7px;
-            font-weight: 800;
-            text-transform: uppercase;
-            margin-bottom: 12px;
-        }
-
-        .heading-row h1 {
-            font-size: clamp(38px, 5vw, 62px);
-            letter-spacing: -3px;
-            line-height: 1;
-        }
-
-        .heading-row p {
-            margin-top: 13px;
-            color: #858d9b;
-            font-size: 14px;
-            line-height: 1.6;
-            max-width: 620px;
-        }
-
-        .network-live {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-
-            padding: 10px 14px;
-            border-radius: 9px;
-
-            background: rgba(199,255,85,0.06);
-            border: 1px solid rgba(199,255,85,0.14);
-
-            color: #c7ff55;
-            font-size: 12px;
-            white-space: nowrap;
-        }
-
-        .live-dot {
-            width: 7px;
-            height: 7px;
-            background: #c7ff55;
-            border-radius: 50%;
-            box-shadow: 0 0 10px #c7ff55;
-        }
-
-        /* ---------- KPI ---------- */
-
-        .kpis {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 14px;
-            margin-bottom: 18px;
-        }
-
-        .kpi {
-            padding: 23px;
-
-            background:
-                linear-gradient(
-                    145deg,
-                    rgba(255,255,255,0.045),
-                    rgba(255,255,255,0.015)
-                );
-
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 16px;
-
-            position: relative;
-            overflow: hidden;
-
-            transition: 0.25s;
-        }
-
-        .kpi:hover {
-            transform: translateY(-3px);
-            border-color: rgba(199,255,85,0.2);
-        }
-
-        .kpi::after {
-            content: "";
-            position: absolute;
-
-            width: 120px;
-            height: 120px;
-
-            right: -60px;
-            bottom: -60px;
-
-            background: radial-gradient(
-                circle,
-                rgba(199,255,85,0.08),
-                transparent 70%
-            );
-        }
-
-        .kpi-label {
-            color: #858d9b;
-            font-size: 12px;
-        }
-
-        .kpi-value {
-            font-size: 31px;
-            font-weight: 800;
-            margin-top: 12px;
-            letter-spacing: -1px;
-        }
-
-        .kpi-change {
-            margin-top: 9px;
-            font-size: 11px;
-            color: #c7ff55;
-        }
-
-        .kpi-change.neutral {
-            color: #82a8ff;
-        }
-
-        /* ---------- GRID ---------- */
-
-        .grid {
-            display: grid;
-            grid-template-columns: 1.65fr 1fr;
-            gap: 16px;
-        }
-
-        .panel {
-            background:
-                linear-gradient(
-                    145deg,
-                    rgba(255,255,255,0.04),
-                    rgba(255,255,255,0.015)
-                );
-
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 17px;
-
-            padding: 23px;
-
-            min-width: 0;
-        }
-
-        .panel.large {
-            grid-row: span 2;
-        }
-
-        .panel-title {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-
-            margin-bottom: 23px;
-        }
-
-        .panel-title h2 {
-            font-size: 16px;
-            letter-spacing: -0.3px;
-        }
-
-        .panel-title span {
-            color: #697180;
-            font-size: 11px;
-        }
-
-        .chart-box {
-            height: 315px;
-        }
-
-        /* ---------- ROUTES ---------- */
-
-        .route {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-
-            padding: 14px 0;
-
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-        }
-
-        .route:last-child {
-            border-bottom: none;
-        }
-
-        .route-number {
-            width: 42px;
-            height: 42px;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            border-radius: 10px;
-
-            background: rgba(199,255,85,0.09);
-            color: #c7ff55;
-
-            font-size: 12px;
-            font-weight: 800;
-        }
-
-        .route-info {
-            flex: 1;
-        }
-
-        .route-info strong {
-            font-size: 13px;
-        }
-
-        .route-info small {
-            display: block;
-            color: #6f7785;
-            margin-top: 4px;
-            font-size: 11px;
-        }
-
-        .route-value {
-            text-align: right;
-        }
-
-        .route-value strong {
-            font-size: 14px;
-        }
-
-        .route-value small {
-            display: block;
-            color: #c7ff55;
-            margin-top: 4px;
-            font-size: 10px;
-        }
-
-        /* ---------- ALERTS ---------- */
-
-        .alerts {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .alert {
-            display: flex;
-            gap: 12px;
-
-            padding: 13px;
-
-            border-radius: 11px;
-
-            background: rgba(255,255,255,0.025);
-            border: 1px solid rgba(255,255,255,0.06);
-        }
-
-        .alert-icon {
-            width: 28px;
-            height: 28px;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            border-radius: 7px;
-
-            background: rgba(199,255,85,0.1);
-            color: #c7ff55;
-
-            font-size: 12px;
-        }
-
-        .alert.warning .alert-icon {
-            background: rgba(255,190,70,0.1);
-            color: #ffbe46;
-        }
-
-        .alert strong {
-            font-size: 12px;
-        }
-
-        .alert p {
-            color: #737b89;
-            font-size: 10px;
-            margin-top: 4px;
-            line-height: 1.5;
-        }
-
-        /* ---------- AI ---------- */
-
-        .ai-panel {
-            margin-top: 16px;
-
-            padding: 27px;
-
-            border-radius: 18px;
-
-            background:
-                radial-gradient(
-                    circle at 90% 10%,
-                    rgba(199,255,85,0.08),
-                    transparent 35%
-                ),
-                #0c1016;
-
-            border: 1px solid rgba(199,255,85,0.12);
-        }
-
-        .ai-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .ai-title {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .ai-symbol {
-            width: 35px;
-            height: 35px;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            border-radius: 9px;
-
-            background: #c7ff55;
-            color: #080a0f;
-
-            font-weight: 900;
-        }
-
-        .ai-title h2 {
-            font-size: 17px;
-        }
-
-        .ai-title span {
-            display: block;
-            color: #697180;
-            font-size: 10px;
-            margin-top: 3px;
-        }
-
-        .ai-status {
-            color: #c7ff55;
-            font-size: 10px;
-        }
-
-        .ai-input {
-            display: flex;
-            gap: 9px;
-        }
-
-        .ai-input input {
-            flex: 1;
-
-            padding: 14px 16px;
-
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 10px;
-
-            outline: none;
-
-            background: rgba(255,255,255,0.035);
-            color: white;
-        }
-
-        .ai-input input::placeholder {
-            color: #626a78;
-        }
-
-        .ai-input button {
-            border: none;
-            border-radius: 10px;
-
-            padding: 0 20px;
-
-            background: #c7ff55;
-            color: #080a0f;
-
-            font-weight: 800;
-            cursor: pointer;
-        }
-
-        .ai-answer {
-            margin-top: 15px;
-
-            padding: 15px;
-
-            display: none;
-
-            border-radius: 10px;
-
-            background: rgba(199,255,85,0.05);
-            border: 1px solid rgba(199,255,85,0.1);
-
-            color: #b7bec9;
-            font-size: 12px;
-            line-height: 1.7;
-        }
-
-        /* ---------- FOOTER ---------- */
-
-        .footer {
-            margin-top: 80px;
-            padding-top: 25px;
-
-            border-top: 1px solid rgba(255,255,255,0.07);
-
-            display: flex;
-            justify-content: space-between;
-
-            color: #626a78;
-            font-size: 11px;
-        }
-
-        .footer strong {
-            color: #c7ff55;
-        }
-
-        /* ---------- RESPONSIVE ---------- */
-
-        @media(max-width: 1000px) {
-
-            .kpis {
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .grid {
-                grid-template-columns: 1fr;
-            }
-
-            .panel.large {
-                grid-row: auto;
-            }
-        }
-
-        @media(max-width: 650px) {
-
-            .nav {
-                display: none;
-            }
-
-            .dashboard {
-                width: 92%;
-                padding-top: 35px;
-            }
-
-            .heading-row {
-                align-items: flex-start;
-                flex-direction: column;
-            }
-
-            .kpis {
-                grid-template-columns: 1fr;
-            }
-
-            .chart-box {
-                height: 250px;
-            }
-
-            .ai-input {
-                flex-direction: column;
-            }
-
-            .ai-input button {
-                height: 45px;
-            }
-
-            .footer {
-                flex-direction: column;
-                gap: 8px;
-            }
-        }
-
-    </style>
 </head>
 
 <body>
 
-    <!-- ================= NAVBAR ================= -->
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="logo">TransitFlow</div>
 
-    <header class="topbar">
-
-        <a href="index.html" class="logo">
-            <span class="logo-dot"></span>
-            TransitFlow
-        </a>
-
-        <nav class="nav">
-
-            <a href="index.html">
-                Home
-            </a>
-
-            <a href="dashboard.html" class="active">
-                Intelligence
-            </a>
-
-            <a href="routes.html">
-                Transit Map
-            </a>
-
-            <a href="forecasting.html">
-                Forecast
-            </a>
-
-            <a href="index.html#planner" class="back-btn">
-                Plan Journey
-            </a>
-
-        </nav>
-
-    </header>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="dashboard.html">Intelligence</a>
+            <a href="routes.html">Transit Map</a>
+            <a href="forecasting.html">Forecast</a>
+            <a href="index.html#planner">Plan Journey</a>
+        </div>
+    </nav>
 
 
-    <!-- ================= DASHBOARD ================= -->
-
+    <!-- DASHBOARD -->
     <main class="dashboard">
 
-        <section class="heading-row">
+        <!-- HEADER -->
+        <section class="dashboard-header">
 
             <div>
-
-                <div class="eyebrow">
-                    Network Intelligence
-                </div>
+                <span class="eyebrow">TRANSIT INTELLIGENCE</span>
 
                 <h1>
-                    What's happening<br>
-                    across the network?
+                    Understand the city
+                    <span>through its movement.</span>
                 </h1>
 
                 <p>
-                    A unified view of passenger demand, route
-                    performance, network utilization and service
-                    activity.
+                    Explore ridership patterns, route performance,
+                    peak demand and operational signals across the
+                    TransitFlow network.
                 </p>
-
             </div>
 
-
-            <div class="network-live">
-
-                <span class="live-dot"></span>
-
-                DEMO NETWORK ONLINE
-
+            <div class="status-badge">
+                <span></span>
+                DEMO DATA
             </div>
 
         </section>
 
 
-        <!-- ================= KPI ================= -->
+        <!-- KPI CARDS -->
+        <section class="stats-grid">
 
-        <section class="kpis">
+            <div class="stat-card">
 
-            <div class="kpi">
+                <span class="stat-label">
+                    Passenger Journeys
+                </span>
 
-                <div class="kpi-label">
-                    Passenger journeys
-                </div>
-
-                <div class="kpi-value">
+                <strong data-count="1240000">
                     1.24M
-                </div>
+                </strong>
 
-                <div class="kpi-change">
-                    ↑ 8.4% vs previous period
-                </div>
+                <small>
+                    network-wide
+                </small>
 
             </div>
 
 
-            <div class="kpi">
+            <div class="stat-card">
 
-                <div class="kpi-label">
-                    Estimated revenue
-                </div>
+                <span class="stat-label">
+                    Estimated Revenue
+                </span>
 
-                <div class="kpi-value">
+                <strong>
                     ₹8.6M
-                </div>
+                </strong>
 
-                <div class="kpi-change">
-                    ↑ 5.7% network-wide
-                </div>
+                <small>
+                    current period
+                </small>
 
             </div>
 
 
-            <div class="kpi">
+            <div class="stat-card">
 
-                <div class="kpi-label">
-                    Peak utilization
-                </div>
+                <span class="stat-label">
+                    Peak Utilization
+                </span>
 
-                <div class="kpi-value">
+                <strong>
                     68%
-                </div>
+                </strong>
 
-                <div class="kpi-change neutral">
-                    08:00 — 10:00
-                </div>
+                <small>
+                    network average
+                </small>
 
             </div>
 
 
-            <div class="kpi">
+            <div class="stat-card">
 
-                <div class="kpi-label">
-                    Active alerts
-                </div>
+                <span class="stat-label">
+                    Active Alerts
+                </span>
 
-                <div class="kpi-value">
+                <strong>
                     17
-                </div>
+                </strong>
 
-                <div class="kpi-change">
-                    4 require attention
-                </div>
+                <small>
+                    requires monitoring
+                </small>
 
             </div>
 
         </section>
 
 
-        <!-- ================= MAIN GRID ================= -->
-
-        <section class="grid">
-
+        <!-- CHARTS -->
+        <section class="analytics-grid">
 
             <!-- RIDERSHIP -->
+            <div class="panel large-panel">
 
-            <div class="panel large">
+                <div class="panel-header">
 
-                <div class="panel-title">
+                    <div>
+                        <span class="eyebrow">
+                            RIDERSHIP
+                        </span>
 
-                    <h2>
-                        Passenger demand
-                    </h2>
+                        <h2>
+                            Passenger movement
+                        </h2>
+                    </div>
 
-                    <span>
-                        Last 7 days
+                    <span class="panel-tag">
+                        7 DAYS
                     </span>
 
                 </div>
 
-                <div class="chart-box">
-
+                <div class="chart-container">
                     <canvas id="ridershipChart"></canvas>
-
                 </div>
 
             </div>
 
 
             <!-- TOP ROUTES -->
-
             <div class="panel">
 
-                <div class="panel-title">
+                <div class="panel-header">
 
-                    <h2>
-                        Route performance
-                    </h2>
+                    <div>
+                        <span class="eyebrow">
+                            ROUTE PERFORMANCE
+                        </span>
 
-                    <span>
-                        Today
-                    </span>
+                        <h2>
+                            Top routes
+                        </h2>
+                    </div>
 
                 </div>
 
 
-                <div class="route">
+                <div class="route-ranking">
 
-                    <div class="route-number">
-                        204
-                    </div>
+                    <div class="ranking-item">
+                        <span class="rank">01</span>
 
-                    <div class="route-info">
+                        <div class="route-info">
+                            <strong>Route 204</strong>
+                            <small>18,421 passengers</small>
+                        </div>
 
-                        <strong>
-                            Sector 17 — University
-                        </strong>
-
-                        <small>
-                            High demand · 18.4K journeys
-                        </small>
-
-                    </div>
-
-                    <div class="route-value">
-
-                        <strong>
+                        <span class="route-value">
                             92%
-                        </strong>
-
-                        <small>
-                            utilization
-                        </small>
-
+                        </span>
                     </div>
 
-                </div>
 
+                    <div class="ranking-item">
+                        <span class="rank">02</span>
 
-                <div class="route">
+                        <div class="route-info">
+                            <strong>Route 116</strong>
+                            <small>16,205 passengers</small>
+                        </div>
 
-                    <div class="route-number">
-                        116
+                        <span class="route-value">
+                            84%
+                        </span>
                     </div>
 
-                    <div class="route-info">
 
-                        <strong>
-                            Sector 22 — Mohali
-                        </strong>
+                    <div class="ranking-item">
+                        <span class="rank">03</span>
 
-                        <small>
-                            Stable demand · 16.2K journeys
-                        </small>
+                        <div class="route-info">
+                            <strong>Route 23</strong>
+                            <small>14,782 passengers</small>
+                        </div>
 
+                        <span class="route-value">
+                            78%
+                        </span>
                     </div>
 
-                    <div class="route-value">
 
-                        <strong>
-                            81%
-                        </strong>
+                    <div class="ranking-item">
+                        <span class="rank">04</span>
 
-                        <small>
-                            utilization
-                        </small>
+                        <div class="route-info">
+                            <strong>Route 45</strong>
+                            <small>12,946 passengers</small>
+                        </div>
 
-                    </div>
-
-                </div>
-
-
-                <div class="route">
-
-                    <div class="route-number">
-                        23
-                    </div>
-
-                    <div class="route-info">
-
-                        <strong>
-                            Sector 34 — Panchkula
-                        </strong>
-
-                        <small>
-                            Moderate demand · 13.7K journeys
-                        </small>
-
-                    </div>
-
-                    <div class="route-value">
-
-                        <strong>
-                            74%
-                        </strong>
-
-                        <small>
-                            utilization
-                        </small>
-
-                    </div>
-
-                </div>
-
-
-                <div class="route">
-
-                    <div class="route-number">
-                        45
-                    </div>
-
-                    <div class="route-info">
-
-                        <strong>
-                            ISBT — Industrial Area
-                        </strong>
-
-                        <small>
-                            Moderate demand · 11.9K journeys
-                        </small>
-
-                    </div>
-
-                    <div class="route-value">
-
-                        <strong>
-                            67%
-                        </strong>
-
-                        <small>
-                            utilization
-                        </small>
-
+                        <span class="route-value">
+                            71%
+                        </span>
                     </div>
 
                 </div>
@@ -928,482 +241,155 @@
 
 
             <!-- PEAK HOURS -->
-
             <div class="panel">
 
-                <div class="panel-title">
+                <div class="panel-header">
 
-                    <h2>
-                        Peak-hour demand
-                    </h2>
+                    <div>
+                        <span class="eyebrow">
+                            DEMAND PATTERN
+                        </span>
 
-                    <span>
-                        Average utilization
+                        <h2>
+                            Peak hours
+                        </h2>
+                    </div>
+
+                    <span class="panel-tag">
+                        TODAY
                     </span>
 
                 </div>
 
-                <div style="height:230px;">
-
+                <div class="chart-container">
                     <canvas id="peakChart"></canvas>
-
                 </div>
 
             </div>
 
 
-        </section>
+            <!-- AI INSIGHTS -->
+            <div class="panel insight-panel">
 
-
-        <!-- ================= ALERTS ================= -->
-
-        <section class="panel" style="margin-top:16px;">
-
-            <div class="panel-title">
-
-                <h2>
-                    Network alerts
-                </h2>
-
-                <span>
-                    17 total
-                </span>
-
-            </div>
-
-
-            <div class="alerts">
-
-                <div class="alert">
-
-                    <div class="alert-icon">
-                        ✓
-                    </div>
+                <div class="panel-header">
 
                     <div>
-
-                        <strong>
-                            Route 204 operating normally
-                        </strong>
-
-                        <p>
-                            Service frequency is within expected
-                            range across the network.
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <div class="alert warning">
-
-                    <div class="alert-icon">
-                        !
-                    </div>
-
-                    <div>
-
-                        <strong>
-                            Higher demand expected at Sector 34
-                        </strong>
-
-                        <p>
-                            Historical patterns indicate increased
-                            passenger demand during the evening peak.
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <div class="alert">
-
-                    <div class="alert-icon">
-                        →
-                    </div>
-
-                    <div>
-
-                        <strong>
-                            Weekend demand pattern detected
-                        </strong>
-
-                        <p>
-                            Sunday ridership is approximately 18%
-                            below weekday average in the demo dataset.
-                        </p>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- ================= AI ASSISTANT ================= -->
-
-        <section class="ai-panel">
-
-            <div class="ai-header">
-
-                <div class="ai-title">
-
-                    <div class="ai-symbol">
-                        AI
-                    </div>
-
-                    <div>
+                        <span class="eyebrow">
+                            TRANSITFLOW AI
+                        </span>
 
                         <h2>
                             Ask TransitFlow
                         </h2>
-
-                        <span>
-                            Network intelligence assistant
-                        </span>
-
                     </div>
 
                 </div>
 
-                <div class="ai-status">
-                    ● READY
+
+                <p class="panel-description">
+                    Ask questions about ridership, routes,
+                    revenue or peak demand.
+                </p>
+
+
+                <div class="ai-input">
+
+                    <input
+                        type="text"
+                        id="aiQuestion"
+                        placeholder="e.g. When is demand highest?"
+                    >
+
+                    <button onclick="askTransitFlow()">
+                        Ask
+                    </button>
+
                 </div>
 
-            </div>
 
-
-            <div class="ai-input">
-
-                <input
-                    type="text"
-                    id="aiQuestion"
-                    placeholder="Ask something like: Which route has the highest demand?"
+                <div
+                    id="aiAnswer"
+                    class="ai-answer"
                 >
+                    <span>AI</span>
 
-                <button onclick="askTransitFlow()">
-                    Ask →
-                </button>
+                    <p>
+                        Ask a question to explore the
+                        transit network.
+                    </p>
+                </div>
 
-            </div>
-
-
-            <div
-                class="ai-answer"
-                id="aiAnswer">
             </div>
 
         </section>
 
 
-        <!-- ================= FOOTER ================= -->
-
-        <footer class="footer">
-
-            <div>
-                <strong>TransitFlow</strong>
-                · Public Transit Intelligence
-            </div>
+        <!-- FORECAST CTA -->
+        <section class="dashboard-cta">
 
             <div>
-                Demo / simulated network data
+
+                <span class="eyebrow">
+                    DEMAND FORECASTING
+                </span>
+
+                <h2>
+                    Predict what the network
+                    needs next.
+                </h2>
+
+                <p>
+                    Explore demand forecasts and identify
+                    upcoming pressure points across the network.
+                </p>
+
             </div>
 
-        </footer>
+            <a
+                href="forecasting.html"
+                class="primary-btn"
+            >
+                Open Forecast →
+            </a>
+
+        </section>
+
+
+        <!-- DATA NOTE -->
+        <section class="data-note">
+
+            <strong>
+                Data transparency
+            </strong>
+
+            <p>
+                The analytics displayed on this page are
+                demonstration values for the TransitFlow
+                interface. They do not represent live CTU
+                operational data.
+            </p>
+
+        </section>
 
     </main>
 
 
-    <!-- ================= DASHBOARD JS ================= -->
+    <!-- FOOTER -->
+    <footer class="footer">
 
-    <script>
+        <div>
+            © 2026 TransitFlow
+        </div>
 
-        /* ==========================================
-           RIDERSHIP CHART
-           ========================================== */
+        <div>
+            Urban mobility intelligence
+        </div>
 
-        const ridership =
-            document.getElementById("ridershipChart");
+    </footer>
 
-        new Chart(ridership, {
 
-            type: "line",
-
-            data: {
-
-                labels: [
-                    "Mon",
-                    "Tue",
-                    "Wed",
-                    "Thu",
-                    "Fri",
-                    "Sat",
-                    "Sun"
-                ],
-
-                datasets: [{
-
-                    label: "Passenger journeys",
-
-                    data: [
-                        154,
-                        168,
-                        162,
-                        181,
-                        193,
-                        139,
-                        126
-                    ],
-
-                    borderColor: "#c7ff55",
-
-                    backgroundColor:
-                        "rgba(199,255,85,0.08)",
-
-                    borderWidth: 2,
-
-                    fill: true,
-
-                    tension: 0.4,
-
-                    pointRadius: 3,
-
-                    pointBackgroundColor: "#c7ff55"
-
-                }]
-
-            },
-
-            options: {
-
-                responsive: true,
-
-                maintainAspectRatio: false,
-
-                plugins: {
-
-                    legend: {
-                        display: false
-                    }
-
-                },
-
-                scales: {
-
-                    x: {
-                        grid: {
-                            color:
-                                "rgba(255,255,255,0.05)"
-                        },
-
-                        ticks: {
-                            color: "#6f7785"
-                        }
-                    },
-
-                    y: {
-
-                        grid: {
-                            color:
-                                "rgba(255,255,255,0.05)"
-                        },
-
-                        ticks: {
-                            color: "#6f7785"
-                        }
-                    }
-
-                }
-
-            }
-
-        });
-
-
-        /* ==========================================
-           PEAK HOURS
-           ========================================== */
-
-        const peak =
-            document.getElementById("peakChart");
-
-        new Chart(peak, {
-
-            type: "bar",
-
-            data: {
-
-                labels: [
-                    "6AM",
-                    "8AM",
-                    "10AM",
-                    "12PM",
-                    "2PM",
-                    "4PM",
-                    "6PM",
-                    "8PM"
-                ],
-
-                datasets: [{
-
-                    data: [
-                        42,
-                        91,
-                        73,
-                        58,
-                        52,
-                        67,
-                        88,
-                        49
-                    ],
-
-                    backgroundColor:
-                        "#c7ff55",
-
-                    borderRadius: 5
-
-                }]
-
-            },
-
-            options: {
-
-                responsive: true,
-
-                maintainAspectRatio: false,
-
-                plugins: {
-
-                    legend: {
-                        display: false
-                    }
-
-                },
-
-                scales: {
-
-                    x: {
-
-                        grid: {
-                            display: false
-                        },
-
-                        ticks: {
-                            color: "#6f7785"
-                        }
-
-                    },
-
-                    y: {
-
-                        beginAtZero: true,
-
-                        grid: {
-                            color:
-                                "rgba(255,255,255,0.05)"
-                        },
-
-                        ticks: {
-                            color: "#6f7785"
-                        }
-
-                    }
-
-                }
-
-            }
-
-        });
-
-
-        /* ==========================================
-           ASK TRANSITFLOW
-           ========================================== */
-
-        function askTransitFlow() {
-
-            const input =
-                document.getElementById("aiQuestion");
-
-            const answer =
-                document.getElementById("aiAnswer");
-
-            const question =
-                input.value.toLowerCase();
-
-            let response = "";
-
-            if (
-                question.includes("route") ||
-                question.includes("bus")
-            ) {
-
-                response =
-                    "<strong>Route 204</strong> currently " +
-                    "shows the highest passenger demand in " +
-                    "the demonstration dataset, with approximately " +
-                    "<strong>18,421 journeys</strong>.";
-
-            }
-
-            else if (
-                question.includes("peak") ||
-                question.includes("busy") ||
-                question.includes("time")
-            ) {
-
-                response =
-                    "The strongest demand window is around " +
-                    "<strong>08:00–10:00</strong>, followed by " +
-                    "the evening period around <strong>18:00</strong>.";
-
-            }
-
-            else if (
-                question.includes("revenue") ||
-                question.includes("money")
-            ) {
-
-                response =
-                    "Estimated network revenue is approximately " +
-                    "<strong>₹8.6M</strong> for the current " +
-                    "demonstration period.";
-
-            }
-
-            else if (
-                question.includes("passenger") ||
-                question.includes("ridership") ||
-                question.includes("demand")
-            ) {
-
-                response =
-                    "The network contains approximately " +
-                    "<strong>1.24M passenger journeys</strong> " +
-                    "in the demonstration dataset.";
-
-            }
-
-            else {
-
-                response =
-                    "Based on the current demonstration data, " +
-                    "Route 204 has the highest demand and the " +
-                    "08:00–10:00 period represents the strongest " +
-                    "network-wide peak.";
-
-            }
-
-            answer.innerHTML = response;
-
-            answer.style.display = "block";
-        }
-
-    </script>
+    <!-- DASHBOARD JAVASCRIPT -->
+    <script src="js/dashboard.js"></script>
 
 </body>
 </html>
