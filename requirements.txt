@@ -1,9 +1,0 @@
-streamlit
-pandas
-numpy
-bcrypt
-folium
-streamlit-folium
-plotly
-statsmodels
-scikit-learn
