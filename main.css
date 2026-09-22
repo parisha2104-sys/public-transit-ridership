@@ -1,3 +1,7 @@
+body {
+    background: #080a0f !important;
+    color: white !important;
+}
 :root {
 
     --bg: #080a0f;
